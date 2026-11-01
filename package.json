@@ -1,0 +1,27 @@
+{
+  "name": "agrotwin-share",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AgroTwin-Share: IoT & Hydro-Thermal Digital Twin Platform for Post-Harvest Produce Shelf-Life Prediction",
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build",
+    "dev": "cd frontend && npm run dev",
+    "preview": "cd frontend && npm run preview",
+    "test:backend": "cd backend && python -m unittest discover -s tests -p \"test_*.py\" -v"
+  },
+  "keywords": [
+    "digital-twin",
+    "scada",
+    "iot",
+    "post-harvest",
+    "shelf-life-index",
+    "arrhenius",
+    "hydro-thermal",
+    "fastapi",
+    "react",
+    "vite",
+    "recharts"
+  ],
+  "author": "aaronaji007",
+  "license": "MIT"
+}

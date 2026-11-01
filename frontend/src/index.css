@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-scada-deep: #0a0e14;
+    --bg-scada-panel: #111822;
+    --bg-scada-card: #16202e;
+    --bg-scada-subtle: #1c293a;
+    --border-scada: #233549;
+    --border-accent: #2e4a68;
+    --scada-cyan: #00d2ff;
+    --scada-green: #00e676;
+    --scada-amber: #ffab00;
+    --scada-red: #ff3366;
+    --scada-purple: #a855f7;
+  }
+
+  body {
+    background-color: #0b0f17;
+    color: #e2e8f0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom scrollbars for SCADA control panels */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0d131c;
+}
+::-webkit-scrollbar-thumb {
+  background: #233549;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3b5577;
+}
+
+/* Pulse animation utility for telemetry sensors */
+@keyframes scada-ping-slow {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.4); opacity: 0; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+
+.scada-pulse {
+  animation: scada-ping-slow 2.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Glass panel effect */
+.scada-panel {
+  background: rgba(17, 24, 34, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid #1e2e42;
+}
+
+.scada-card-hover {
+  transition: all 0.2s ease-in-out;
+}
+.scada-card-hover:hover {
+  border-color: #00d2ff80;
+  box-shadow: 0 0 15px rgba(0, 210, 255, 0.12);
+}
