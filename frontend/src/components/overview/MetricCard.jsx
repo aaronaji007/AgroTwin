@@ -1,106 +1,85 @@
 import React from "react";
-import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 
 export function MetricCard({
+  index = "01",
   title,
   value,
   unit,
-  icon: Icon,
-  trend,
   trendLabel,
   trendType = "neutral", // "positive" | "warning" | "danger" | "neutral"
   subtext,
-  accentColor = "cyan"
+  signalColor = "green" // "green" | "amber" | "red" | "white"
 }) {
-  const colorMap = {
-    cyan: {
-      border: "border-cyan-500/30",
-      bg: "from-cyan-500/10 to-transparent",
-      iconBg: "bg-cyan-500/20 text-cyan-400 border-cyan-500/40",
-      glow: "hover:border-cyan-400/50 hover:shadow-[0_0_20px_rgba(0,210,255,0.15)]"
-    },
-    emerald: {
-      border: "border-emerald-500/30",
-      bg: "from-emerald-500/10 to-transparent",
-      iconBg: "bg-emerald-500/20 text-emerald-400 border-emerald-500/40",
-      glow: "hover:border-emerald-400/50 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)]"
+  const signalConfigs = {
+    green: {
+      accent: "text-[#00FF66]",
+      borderAccent: "border-l-2 border-[#00FF66]",
+      pip: "text-[#00FF66]"
     },
     amber: {
-      border: "border-amber-500/30",
-      bg: "from-amber-500/10 to-transparent",
-      iconBg: "bg-amber-500/20 text-amber-400 border-amber-500/40",
-      glow: "hover:border-amber-400/50 hover:shadow-[0_0_20px_rgba(245,158,11,0.15)]"
+      accent: "text-[#FFB000]",
+      borderAccent: "border-l-2 border-[#FFB000]",
+      pip: "text-[#FFB000]"
     },
-    rose: {
-      border: "border-rose-500/30",
-      bg: "from-rose-500/10 to-transparent",
-      iconBg: "bg-rose-500/20 text-rose-400 border-rose-500/40",
-      glow: "hover:border-rose-400/50 hover:shadow-[0_0_20px_rgba(244,63,94,0.15)]"
+    red: {
+      accent: "text-[#FF3333]",
+      borderAccent: "border-l-2 border-[#FF3333]",
+      pip: "text-[#FF3333]"
     },
-    purple: {
-      border: "border-purple-500/30",
-      bg: "from-purple-500/10 to-transparent",
-      iconBg: "bg-purple-500/20 text-purple-400 border-purple-500/40",
-      glow: "hover:border-purple-400/50 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)]"
+    white: {
+      accent: "text-white",
+      borderAccent: "border-l-2 border-white",
+      pip: "text-white"
     }
   };
 
-  const style = colorMap[accentColor] || colorMap.cyan;
-
-  const trendStyles = {
-    positive: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
-    warning: "bg-amber-500/20 text-amber-300 border-amber-500/30",
-    danger: "bg-rose-500/20 text-rose-300 border-rose-500/30",
-    neutral: "bg-slate-700/30 text-slate-300 border-slate-600/30"
-  };
+  const signal = signalConfigs[signalColor] || signalConfigs.white;
 
   return (
     <div
-      className={`relative rounded-2xl bg-[#0f1724] border ${style.border} p-4 transition-all duration-300 ${style.glow} bg-gradient-to-b ${style.bg} flex flex-col justify-between`}
+      className={`min-h-[160px] p-6 lg:p-7 bg-[#0A0A0A] border border-[#262626] transition-colors duration-100 hover:bg-[#0F0F0F] flex flex-col justify-between select-none ${signal.borderAccent}`}
     >
-      {/* Top Header */}
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-mono uppercase tracking-wider text-slate-400">
-          {title}
+      {/* Top Metadata Header */}
+      <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-neutral-400">
+        <span className="flex items-center gap-1.5">
+          <span className={signal.pip}>■</span>
+          <span>{index} // {title}</span>
         </span>
-        <div className={`p-2 rounded-xl border ${style.iconBg}`}>
-          <Icon className="w-4 h-4" />
-        </div>
+        {trendLabel && (
+          <span
+            className={`px-1.5 py-0.5 border text-[9px] font-semibold tracking-wider ${
+              trendType === "positive"
+                ? "border-[#00FF66]/30 text-[#00FF66] bg-[#00FF66]/10"
+                : trendType === "warning"
+                ? "border-[#FFB000]/40 text-[#FFB000] bg-[#FFB000]/10"
+                : trendType === "danger"
+                ? "border-[#FF3333]/50 text-[#FF3333] bg-[#FF3333]/10"
+                : "border-[#262626] text-neutral-400 bg-[#141414]"
+            }`}
+          >
+            {trendLabel}
+          </span>
+        )}
       </div>
 
-      {/* Main Metric Value */}
+      {/* Main Massive Editorial Metric */}
       <div className="my-3">
-        <div className="flex items-baseline gap-1.5">
-          <span className="text-2xl lg:text-3xl font-extrabold font-mono text-white tracking-tight">
+        <div className="flex items-baseline gap-2">
+          <span className="font-serif italic text-5xl lg:text-6xl text-white font-normal tracking-tight">
             {value}
           </span>
           {unit && (
-            <span className="text-sm font-mono text-slate-400 font-medium">
+            <span className="font-mono text-xs uppercase tracking-wider text-neutral-400 font-semibold">
               {unit}
             </span>
           )}
         </div>
       </div>
 
-      {/* Trend & Subtext footer */}
-      <div className="flex items-center justify-between text-xs pt-2 border-t border-[#1a2638]">
-        {trendLabel && (
-          <span
-            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-mono border ${
-              trendStyles[trendType] || trendStyles.neutral
-            }`}
-          >
-            {trend === "up" && <TrendingUp className="w-3 h-3" />}
-            {trend === "down" && <TrendingDown className="w-3 h-3" />}
-            {trend === "flat" && <Minus className="w-3 h-3" />}
-            <span>{trendLabel}</span>
-          </span>
-        )}
-        {subtext && (
-          <span className="text-slate-400 text-[11px] truncate max-w-[150px] font-mono">
-            {subtext}
-          </span>
-        )}
+      {/* Micro Status Subtext */}
+      <div className="font-mono text-[10px] text-neutral-400 uppercase tracking-widest pt-2 border-t border-[#1C1C1C] flex items-center justify-between">
+        <span className="truncate">{subtext}</span>
+        <span className="text-neutral-400">SYS.OK</span>
       </div>
     </div>
   );

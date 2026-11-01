@@ -1,15 +1,4 @@
 import React, { useState } from "react";
-import {
-  X,
-  Bell,
-  CheckCircle,
-  AlertTriangle,
-  AlertOctagon,
-  Info,
-  Sliders,
-  CheckCheck,
-  Clock
-} from "lucide-react";
 import { useTelemetry } from "../../context/TelemetryContext";
 
 export function AlertDrawer() {
@@ -20,7 +9,7 @@ export function AlertDrawer() {
     acknowledgeAlert
   } = useTelemetry();
 
-  const [filter, setFilter] = useState("ALL"); // "ALL" | "UNACKNOWLEDGED" | "CRITICAL"
+  const [filter, setFilter] = useState("ALL");
 
   if (!isAlertDrawerOpen) return null;
 
@@ -30,131 +19,93 @@ export function AlertDrawer() {
     return true;
   });
 
-  const getSeverityStyle = (severity) => {
-    switch (severity) {
-      case "CRITICAL":
-        return {
-          bg: "bg-rose-500/10 border-rose-500/30 text-rose-300",
-          icon: AlertOctagon,
-          badge: "bg-rose-500/20 text-rose-300 border-rose-500/40"
-        };
-      case "WARNING":
-        return {
-          bg: "bg-amber-500/10 border-amber-500/30 text-amber-300",
-          icon: AlertTriangle,
-          badge: "bg-amber-500/20 text-amber-300 border-amber-500/40"
-        };
-      default:
-        return {
-          bg: "bg-blue-500/10 border-blue-500/30 text-blue-300",
-          icon: Info,
-          badge: "bg-blue-500/20 text-blue-300 border-blue-500/40"
-        };
-    }
-  };
-
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-sm transition-opacity flex justify-end">
-      <div className="w-full max-w-md bg-[#0c121d] border-l border-[#1e2d42] h-full flex flex-col shadow-2xl">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-black/80 select-none flex justify-end font-mono">
+      <div className="w-full max-w-lg bg-[#0A0A0A] border-l border-[#262626] h-full flex flex-col">
         {/* Drawer Header */}
-        <div className="p-4 border-b border-[#1e2d42] flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/30">
-              <Bell className="w-4 h-4" />
+        <div className="p-4 border-b border-[#262626] flex items-center justify-between bg-[#0E0E0E]">
+          <div>
+            <div className="text-[10px] uppercase tracking-widest text-neutral-400">
+              [ INCIDENT DISPATCH CORE ]
             </div>
-            <div>
-              <h3 className="font-bold text-white text-sm font-mono">
-                SCADA Operational Alarms
-              </h3>
-              <p className="text-[11px] text-slate-400 font-mono">
-                {alerts.filter(a => !a.acknowledged).length} unacknowledged events
-              </p>
-            </div>
+            <h3 className="font-serif italic text-2xl text-white font-normal mt-0.5 tracking-tight">
+              SCADA Alarm Journal
+            </h3>
           </div>
           <button
             onClick={() => setIsAlertDrawerOpen(false)}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#15202f] transition-colors cursor-pointer"
+            className="px-2.5 py-1 border border-[#262626] bg-[#141414] text-neutral-400 hover:text-white hover:border-white transition-colors cursor-pointer text-xs uppercase"
           >
-            <X className="w-5 h-5" />
+            [ CLOSE ]
           </button>
         </div>
 
-        {/* Filter Pills */}
-        <div className="px-4 py-2.5 border-b border-[#182638] flex items-center gap-1.5 text-xs font-mono">
+        {/* Filter Bar */}
+        <div className="px-4 py-2 border-b border-[#202020] flex items-center gap-2 text-xs bg-[#070707]">
           {["ALL", "UNACKNOWLEDGED", "CRITICAL"].map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+              className={`px-3 py-1 border transition-colors cursor-pointer uppercase text-[10px] tracking-wider ${
                 filter === f
-                  ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/40 font-semibold"
-                  : "bg-[#121c2b] text-slate-400 border-[#1f3044] hover:text-slate-200"
+                  ? "border-white bg-[#EDEDED] text-black font-bold"
+                  : "border-[#262626] bg-[#111111] text-neutral-400 hover:text-white"
               }`}
             >
-              {f}
+              [ {f} ]
             </button>
           ))}
         </div>
 
         {/* Alerts List */}
-        <div className="p-4 space-y-3 flex-1 overflow-y-auto">
+        <div className="p-4 space-y-3 flex-1 overflow-y-auto divide-y divide-[#1C1C1C]">
           {filteredAlerts.length === 0 ? (
-            <div className="text-center py-12 text-slate-400 font-mono text-xs">
-              <CheckCircle className="w-8 h-8 text-emerald-400 mx-auto mb-2 opacity-60" />
-              <p>No alarms matching the selected filter.</p>
-              <p className="text-slate-400 mt-1">All storage chambers operating within tolerance.</p>
+            <div className="text-center py-16 text-neutral-400 text-xs uppercase tracking-widest">
+              [ ZERO ALARMS MATCHING QUERY ]
             </div>
           ) : (
             filteredAlerts.map((alert) => {
-              const style = getSeverityStyle(alert.severity);
-              const Icon = style.icon;
+              const isCritical = alert.severity === "CRITICAL";
               return (
                 <div
                   key={alert.id}
-                  className={`p-3.5 rounded-xl border transition-all ${style.bg} flex flex-col justify-between`}
+                  className={`pt-3 first:pt-0 p-3 border ${
+                    isCritical
+                      ? "border-[#FF3333]/40 bg-[#1A0A0A]"
+                      : "border-[#202020] bg-[#0E0E0E]"
+                  }`}
                 >
-                  <div>
-                    <div className="flex items-center justify-between gap-2 mb-1.5">
-                      <div className="flex items-center gap-1.5 font-mono text-xs font-bold text-white">
-                        <Icon className="w-3.5 h-3.5" />
-                        <span>{alert.binName}</span>
-                      </div>
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${style.badge}`}>
-                        {alert.severity}
-                      </span>
-                    </div>
-
-                    <p className="text-xs text-slate-200 leading-relaxed font-sans mb-2">
-                      {alert.message}
-                    </p>
-
-                    <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 pt-2 border-t border-slate-700/30">
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-slate-500" />
-                        {new Date(alert.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                      </span>
-                      {alert.value && (
-                        <span>
-                          Param: <strong>{alert.value} {alert.unit}</strong> (Limit: {alert.threshold})
-                        </span>
-                      )}
-                    </div>
+                  <div className="flex items-center justify-between text-[10px] uppercase tracking-wider mb-1.5">
+                    <span className="font-bold text-white">
+                      {alert.binName} // {alert.parameter}
+                    </span>
+                    <span
+                      className={`px-1.5 py-0.5 border text-[9px] font-bold ${
+                        isCritical
+                          ? "border-[#FF3333] text-[#FF3333]"
+                          : "border-[#FFB000] text-[#FFB000]"
+                      }`}
+                    >
+                      [ {alert.severity} ]
+                    </span>
                   </div>
 
-                  {/* Acknowledge Button */}
-                  <div className="mt-2.5 flex justify-end">
+                  <p className="text-xs text-neutral-200 font-sans leading-relaxed my-2">
+                    {alert.message}
+                  </p>
+
+                  <div className="flex items-center justify-between text-[10px] text-neutral-400 pt-2 border-t border-[#1C1C1C]">
+                    <span>
+                      VAL: {alert.value} {alert.unit} (LIMIT: {alert.threshold})
+                    </span>
                     {alert.acknowledged ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-mono text-slate-400">
-                        <CheckCheck className="w-3.5 h-3.5 text-emerald-400" />
-                        Acknowledged
-                      </span>
+                      <span className="text-[#00FF66]">[ ACKNOWLEDGED ]</span>
                     ) : (
                       <button
                         onClick={() => acknowledgeAlert(alert.id)}
-                        className="px-2.5 py-1 rounded-lg bg-[#141e2e] hover:bg-[#1c2a3d] border border-cyan-500/40 text-cyan-300 hover:text-white font-mono text-xs font-medium transition-all cursor-pointer flex items-center gap-1"
+                        className="px-2 py-0.5 border border-[#262626] bg-[#EDEDED] text-black hover:bg-[#00FF66] font-bold uppercase text-[9px] cursor-pointer"
                       >
-                        <CheckCircle className="w-3 h-3" />
-                        <span>Acknowledge</span>
+                        [ ACK ]
                       </button>
                     )}
                   </div>
@@ -165,17 +116,17 @@ export function AlertDrawer() {
         </div>
 
         {/* Footer */}
-        <div className="p-3 border-t border-[#1e2d42] bg-[#0a0e16] flex justify-between items-center text-xs font-mono">
-          <span className="text-slate-400 text-[11px]">AgroTwin Alert Core</span>
+        <div className="p-4 border-t border-[#262626] bg-[#0E0E0E] flex justify-between items-center text-xs">
+          <span className="text-[10px] uppercase text-neutral-400">TELEMETRY JOURNAL ACTIVE</span>
           <button
             onClick={() => {
               alerts.forEach(a => {
                 if (!a.acknowledged) acknowledgeAlert(a.id);
               });
             }}
-            className="text-cyan-400 hover:underline cursor-pointer"
+            className="text-white hover:text-[#00FF66] uppercase text-[10px] tracking-wider cursor-pointer"
           >
-            Acknowledge All Alarms
+            [ ACKNOWLEDGE ALL ]
           </button>
         </div>
       </div>

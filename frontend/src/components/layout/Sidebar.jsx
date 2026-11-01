@@ -1,15 +1,4 @@
 import React from "react";
-import {
-  LayoutDashboard,
-  Box,
-  Cpu,
-  PackageCheck,
-  AlertTriangle,
-  Sliders,
-  Sparkles,
-  Thermometer,
-  Layers
-} from "lucide-react";
 import { useTelemetry } from "../../context/TelemetryContext";
 
 export function Sidebar() {
@@ -26,81 +15,66 @@ export function Sidebar() {
   const unreadAlertCount = alerts.filter(a => !a.acknowledged).length;
 
   const navItems = [
-    {
-      id: "overview",
-      label: "Control Center",
-      icon: LayoutDashboard,
-      badge: null
-    },
-    {
-      id: "bins",
-      label: "Storage Bins SCADA",
-      icon: Box,
-      badge: `${bins.length} Active`
-    },
-    {
-      id: "digitaltwin",
-      label: "Digital Twin Engine",
-      icon: Cpu,
-      badge: "Arrhenius"
-    },
-    {
-      id: "batches",
-      label: "Produce Batches",
-      icon: PackageCheck,
-      badge: null
-    },
+    { id: "overview", num: "01", label: "CONTROL MATRIX", badge: null },
+    { id: "bins", num: "02", label: "STORAGE CHAMBERS", badge: `${bins.length} UNITS` },
+    { id: "digitaltwin", num: "03", label: "DIGITAL TWIN MODEL", badge: "Q10/VPD" },
+    { id: "batches", num: "04", label: "BIOMASS LEDGER", badge: null },
     {
       id: "alerts",
-      label: "Alarms & Thresholds",
-      icon: AlertTriangle,
-      badge: unreadAlertCount > 0 ? `${unreadAlertCount} Alert` : null,
-      badgeColor: "rose"
+      num: "05",
+      label: "LIMITS & ALARMS",
+      badge: unreadAlertCount > 0 ? `! ${unreadAlertCount}` : null,
+      isWarning: unreadAlertCount > 0
     }
   ];
 
   return (
-    <aside className="w-64 bg-[#0a0e16] border-r border-[#1e2d42] flex flex-col shrink-0 select-none">
-      {/* Facility Header */}
-      <div className="p-4 border-b border-[#1a2638]">
-        <div className="flex items-center gap-2 text-xs font-mono text-cyan-400 uppercase tracking-wider mb-1">
-          <Layers className="w-3.5 h-3.5" />
-          <span>Facility Matrix</span>
+    <aside className="w-64 bg-[#0A0A0A] border-r border-[#262626] flex flex-col shrink-0 select-none">
+      {/* Sector Station Tag */}
+      <div className="p-4 border-b border-[#262626] bg-[#0E0E0E]">
+        <div className="font-mono text-[10px] text-neutral-400 tracking-widest uppercase">
+          FACILITY ARCHITECTURE
         </div>
-        <p className="text-sm font-semibold text-slate-200 truncate">
-          Central Cold Hub #4
-        </p>
-        <p className="text-xs text-slate-400">Atmospheric Control Sector</p>
+        <div className="font-serif italic text-lg text-white font-normal mt-0.5">
+          Atmospheric Sector 04
+        </div>
+        <div className="font-mono text-[10px] text-neutral-400 mt-1 flex items-center justify-between">
+          <span>ZONE: COLD-CHAIN-A</span>
+          <span className="text-[#00FF66]">[ SYNC ]</span>
+        </div>
       </div>
 
-      {/* Main Navigation */}
-      <nav className="p-3 space-y-1.5 flex-1 overflow-y-auto">
-        <div className="text-[11px] font-mono uppercase tracking-wider text-slate-400 px-3 py-1">
-          Operations
+      {/* Main Navigation Grid */}
+      <nav className="flex-1 divide-y divide-[#1C1C1C] overflow-y-auto">
+        <div className="px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-neutral-400 bg-[#070707]">
+          [ MODULE DIRECTORY ]
         </div>
         {navItems.map(item => {
-          const Icon = item.icon;
           const isActive = activeTab === item.id;
           return (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
+              className={`w-full flex items-center justify-between px-4 py-3.5 text-left font-mono text-xs uppercase tracking-wider transition-colors duration-100 cursor-pointer ${
                 isActive
-                  ? "bg-gradient-to-r from-cyan-500/20 to-blue-500/10 text-cyan-300 border border-cyan-500/40 shadow-[0_0_15px_rgba(0,210,255,0.1)]"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-[#141e2e]/50"
+                  ? "bg-[#EDEDED] text-black font-bold"
+                  : "text-neutral-400 hover:text-white hover:bg-[#121212]"
               }`}
             >
-              <div className="flex items-center gap-2.5">
-                <Icon className={`w-4 h-4 ${isActive ? "text-cyan-400" : "text-slate-400"}`} />
-                <span className="font-medium">{item.label}</span>
+              <div className="flex items-center gap-3">
+                <span className={isActive ? "text-neutral-600 font-normal" : "text-neutral-400"}>
+                  {item.num}
+                </span>
+                <span>{item.label}</span>
               </div>
               {item.badge && (
                 <span
-                  className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold ${
-                    item.badgeColor === "rose"
-                      ? "bg-rose-500/20 text-rose-300 border border-rose-500/30"
-                      : "bg-[#182538] text-slate-300 border border-[#243750]"
+                  className={`text-[9px] px-1.5 py-0.5 font-bold ${
+                    item.isWarning
+                      ? "bg-[#FFB000] text-black"
+                      : isActive
+                      ? "bg-black text-white"
+                      : "border border-[#262626] text-neutral-400"
                   }`}
                 >
                   {item.badge}
@@ -110,14 +84,14 @@ export function Sidebar() {
           );
         })}
 
-        {/* Quick Bin Navigation Switcher */}
-        <div className="pt-5">
-          <div className="text-[11px] font-mono uppercase tracking-wider text-slate-400 px-3 py-1 flex items-center justify-between">
-            <span>Storage Chambers</span>
-            <span className="text-cyan-400 font-mono text-[10px]">{bins.length}</span>
+        {/* Storage Chamber Switchboard */}
+        <div className="pt-2">
+          <div className="px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-neutral-400 bg-[#070707] flex items-center justify-between">
+            <span>[ ACTIVE CHAMBERS ]</span>
+            <span className="text-white">{bins.length}</span>
           </div>
-          <div className="space-y-1 mt-1">
-            {bins.map(bin => {
+          <div className="divide-y divide-[#171717]">
+            {bins.map((bin, idx) => {
               const isSelected = selectedBinId === bin.id && activeTab === "bins";
               const isWarning = bin.status === "WARNING";
               const isCritical = bin.status === "CRITICAL";
@@ -129,33 +103,39 @@ export function Sidebar() {
                     setSelectedBinId(bin.id);
                     setActiveTab("bins");
                   }}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-all flex items-center justify-between cursor-pointer ${
+                  className={`w-full text-left px-4 py-2.5 font-mono text-xs transition-colors duration-100 flex items-center justify-between cursor-pointer ${
                     isSelected
-                      ? "bg-[#172335] text-cyan-300 border border-cyan-500/40"
-                      : "text-slate-400 hover:text-slate-200 hover:bg-[#121a27]"
+                      ? "bg-[#1C1C1C] text-white border-l-2 border-[#00FF66]"
+                      : "text-neutral-400 hover:text-white hover:bg-[#111111]"
                   }`}
                 >
                   <div className="truncate">
-                    <div className="font-medium truncate text-slate-200">{bin.name}</div>
-                    <div className="text-[10px] text-slate-400 truncate flex items-center gap-1.5">
-                      <span>{bin.produceName}</span>
-                      <span>•</span>
-                      <span className="font-mono text-cyan-400">{bin.telemetry.temperature}°C</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-neutral-400 text-[10px]">0{idx + 1}.</span>
+                      <span className="text-white font-medium truncate">{bin.name}</span>
+                    </div>
+                    <div className="text-[10px] text-neutral-400 mt-0.5 truncate flex items-center gap-2">
+                      <span className="text-white">{bin.telemetry.temperature}°C</span>
+                      <span>/</span>
+                      <span>{bin.telemetry.humidity}% RH</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1.5 shrink-0 ml-2">
-                    <span className="text-[10px] font-mono text-slate-400">
+
+                  <div className="flex items-center gap-2 shrink-0 ml-2">
+                    <span className="text-[10px] text-neutral-400 font-bold">
                       {Math.round(bin.telemetry.sli)}%
                     </span>
                     <span
-                      className={`w-2 h-2 rounded-full ${
+                      className={`text-[9px] ${
                         isCritical
-                          ? "bg-rose-500 animate-ping"
+                          ? "text-[#FF3333] animate-pulse"
                           : isWarning
-                          ? "bg-amber-400"
-                          : "bg-emerald-400"
+                          ? "text-[#FFB000]"
+                          : "text-[#00FF66]"
                       }`}
-                    />
+                    >
+                      ■
+                    </span>
                   </div>
                 </button>
               );
@@ -164,28 +144,26 @@ export function Sidebar() {
         </div>
       </nav>
 
-      {/* Facility KPI mini-dock */}
+      {/* Terminal Summary Dock */}
       {summary && (
-        <div className="p-3 border-t border-[#1a2638] bg-[#0c121d]">
-          <div className="bg-[#121c2b] rounded-xl p-3 border border-[#203147]">
-            <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-              <span className="font-mono uppercase text-[10px]">Inventory Value</span>
-              <span className="text-emerald-400 font-mono font-semibold">
-                ${(summary.totalInventoryValueUsd / 1000).toFixed(1)}k
-              </span>
-            </div>
-            <div className="flex items-center justify-between text-xs text-slate-400">
-              <span className="font-mono uppercase text-[10px]">Average SLI</span>
-              <span className="text-cyan-300 font-mono font-bold">
-                {summary.avgSli}%
-              </span>
-            </div>
-            <div className="w-full bg-[#1b283b] h-1.5 rounded-full mt-2 overflow-hidden">
-              <div
-                className="bg-gradient-to-r from-cyan-400 to-emerald-400 h-full rounded-full transition-all duration-500"
-                style={{ width: `${summary.avgSli}%` }}
-              />
-            </div>
+        <div className="p-4 border-t border-[#262626] bg-[#0E0E0E] font-mono">
+          <div className="flex items-center justify-between text-[10px] text-neutral-400 uppercase tracking-widest">
+            <span>INVENTORY VALUATION</span>
+            <span className="text-white font-bold">
+              ${(summary.totalInventoryValueUsd / 1000).toFixed(1)}K
+            </span>
+          </div>
+          <div className="flex items-center justify-between text-[10px] text-neutral-400 uppercase tracking-widest mt-1.5">
+            <span>MEAN SHELF-LIFE (SLI)</span>
+            <span className="text-[#00FF66] font-bold">
+              {summary.avgSli}%
+            </span>
+          </div>
+          <div className="w-full bg-[#202020] h-1 mt-2">
+            <div
+              className="bg-[#00FF66] h-full transition-all duration-100"
+              style={{ width: `${summary.avgSli}%` }}
+            />
           </div>
         </div>
       )}

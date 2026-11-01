@@ -1,17 +1,4 @@
 import React, { useState } from "react";
-import {
-  Snowflake,
-  Fan,
-  Zap,
-  Sliders,
-  AlertTriangle,
-  Play,
-  RotateCcw,
-  CheckCircle,
-  Activity,
-  Flame,
-  DoorOpen
-} from "lucide-react";
 import { useTelemetry } from "../../context/TelemetryContext";
 
 export function ActuatorControls({ bin }) {
@@ -25,198 +12,155 @@ export function ActuatorControls({ bin }) {
     } catch (err) {
       console.error(err);
     } finally {
-      setTimeout(() => setLoadingAction(null), 400);
+      setTimeout(() => setLoadingAction(null), 300);
     }
   };
 
   return (
-    <div className="space-y-4">
-      {/* 1. Actuator Status Cards */}
-      <div className="rounded-2xl bg-[#0f1724] border border-[#1e2d42] p-5">
-        <h4 className="text-xs font-mono uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between">
-          <span>Chamber Actuators & HVAC</span>
-          <span className="text-emerald-400 font-mono text-[11px] flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            PLC Auto-Control
-          </span>
-        </h4>
+    <div className="space-y-6 select-none font-mono">
+      {/* 1. Actuator Relays */}
+      <div className="bg-[#0A0A0A] border border-[#262626] p-6">
+        <div className="flex items-center justify-between pb-3 mb-4 border-b border-[#202020] text-[10px] uppercase tracking-widest text-neutral-400">
+          <span>[ RELAY BANK // ACTUATORS ]</span>
+          <span className="text-[#00FF66]">[ AUTO-PLC ]</span>
+        </div>
 
         <div className="space-y-3">
           {/* Compressor */}
-          <div className="p-3 rounded-xl bg-[#131d2b] border border-[#203147] flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div
-                className={`p-2 rounded-xl border ${
-                  bin.compressorActive
-                    ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/30"
-                    : "bg-rose-500/10 text-rose-400 border-rose-500/30"
-                }`}
-              >
-                <Snowflake className="w-4 h-4" />
+          <div className="p-3 border border-[#202020] bg-[#0E0E0E] flex items-center justify-between">
+            <div>
+              <div className="text-xs font-bold text-white uppercase tracking-wider">
+                01. CHILLER COMPRESSOR
               </div>
-              <div>
-                <div className="text-xs font-semibold text-white">Refrigeration Compressor</div>
-                <div className="text-[11px] text-slate-400 font-mono">
-                  {bin.compressorActive ? "Variable Inverter: 4.8 kW" : "OFFLINE / TRIP"}
-                </div>
+              <div className="text-[10px] text-neutral-400 mt-0.5">
+                {bin.compressorActive ? "LOAD: 4.8 kW • INVERTER" : "CIRCUIT BREAKER OPEN"}
               </div>
             </div>
             <span
-              className={`text-xs font-mono px-2 py-0.5 rounded border ${
+              className={`text-[10px] px-2 py-0.5 border font-bold ${
                 bin.compressorActive
-                  ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/40"
-                  : "bg-rose-500/20 text-rose-300 border-rose-500/40 font-bold"
+                  ? "border-[#00FF66]/30 text-[#00FF66] bg-[#00FF66]/10"
+                  : "border-[#FF3333]/50 text-[#FF3333] bg-[#FF3333]/10"
               }`}
             >
-              {bin.compressorActive ? "RUNNING" : "STOPPED"}
+              {bin.compressorActive ? "[ ACTIVE ]" : "[ TRIP ]"}
             </span>
           </div>
 
           {/* Circulation Fan */}
-          <div className="p-3 rounded-xl bg-[#131d2b] border border-[#203147] flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div
-                className={`p-2 rounded-xl border ${
-                  bin.evaporatorFanActive
-                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                    : "bg-slate-800 text-slate-500 border-slate-700"
-                }`}
-              >
-                <Fan className={`w-4 h-4 ${bin.evaporatorFanActive ? "animate-spin" : ""}`} />
+          <div className="p-3 border border-[#202020] bg-[#0E0E0E] flex items-center justify-between">
+            <div>
+              <div className="text-xs font-bold text-white uppercase tracking-wider">
+                02. EVAPORATOR FANS
               </div>
-              <div>
-                <div className="text-xs font-semibold text-white">Evaporator Circulation Fans</div>
-                <div className="text-[11px] text-slate-400 font-mono">
-                  {bin.evaporatorFanActive ? "1,250 RPM • 4,500 CFM" : "STANDBY"}
-                </div>
+              <div className="text-[10px] text-neutral-400 mt-0.5">
+                {bin.evaporatorFanActive ? "VELOCITY: 1,250 RPM • 4.5k CFM" : "STANDBY"}
               </div>
             </div>
             <span
-              className={`text-xs font-mono px-2 py-0.5 rounded border ${
+              className={`text-[10px] px-2 py-0.5 border font-bold ${
                 bin.evaporatorFanActive
-                  ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
-                  : "bg-slate-800 text-slate-400 border-slate-700"
+                  ? "border-[#00FF66]/30 text-[#00FF66] bg-[#00FF66]/10"
+                  : "border-neutral-800 text-neutral-600 bg-[#111111]"
               }`}
             >
-              {bin.evaporatorFanActive ? "ACTIVE" : "OFF"}
+              {bin.evaporatorFanActive ? "[ ACTIVE ]" : "[ OFF ]"}
             </span>
           </div>
 
           {/* Ethylene Scrubber */}
-          <div className="p-3 rounded-xl bg-[#131d2b] border border-[#203147] flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div
-                className={`p-2 rounded-xl border ${
-                  bin.ethyleneScrubberActive
-                    ? "bg-purple-500/10 text-purple-400 border-purple-500/30"
-                    : "bg-slate-800 text-slate-500 border-slate-700"
-                }`}
-              >
-                <Zap className="w-4 h-4" />
+          <div className="p-3 border border-[#202020] bg-[#0E0E0E] flex items-center justify-between">
+            <div>
+              <div className="text-xs font-bold text-white uppercase tracking-wider">
+                03. C₂H₄ SCRUBBER
               </div>
-              <div>
-                <div className="text-xs font-semibold text-white">Catalytic Ethylene Scrubber</div>
-                <div className="text-[11px] text-slate-400 font-mono">
-                  {bin.ethyleneScrubberActive ? "Catalytic Bed: 120 m³/h" : "DORMANT"}
-                </div>
+              <div className="text-[10px] text-neutral-400 mt-0.5">
+                {bin.ethyleneScrubberActive ? "CATALYST BED: 120 m³/h" : "DORMANT"}
               </div>
             </div>
             <span
-              className={`text-xs font-mono px-2 py-0.5 rounded border ${
+              className={`text-[10px] px-2 py-0.5 border font-bold ${
                 bin.ethyleneScrubberActive
-                  ? "bg-purple-500/20 text-purple-300 border-purple-500/40 animate-pulse font-bold"
-                  : "bg-slate-800 text-slate-400 border-slate-700"
+                  ? "border-[#FFB000]/40 text-[#FFB000] bg-[#FFB000]/10 animate-pulse"
+                  : "border-neutral-800 text-neutral-600 bg-[#111111]"
               }`}
             >
-              {bin.ethyleneScrubberActive ? "PURGING" : "STANDBY"}
+              {bin.ethyleneScrubberActive ? "[ PURGING ]" : "[ IDLE ]"}
             </span>
           </div>
         </div>
       </div>
 
-      {/* 2. Simulation Injector (Dynamic Real-Time Testing) */}
-      <div className="rounded-2xl bg-[#0f1724] border border-[#1e2d42] p-5">
-        <div className="flex items-center justify-between mb-3">
-          <h4 className="text-xs font-mono uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-            <Flame className="w-4 h-4 text-amber-400" />
-            <span>Digital Twin Stress Testing</span>
-          </h4>
-          <span className="text-[10px] text-slate-400 font-mono">Live chamber injection</span>
+      {/* 2. Simulation Stress Injector */}
+      <div className="bg-[#0A0A0A] border border-[#262626] p-6">
+        <div className="flex items-center justify-between pb-3 mb-4 border-b border-[#202020] text-[10px] uppercase tracking-widest text-neutral-400">
+          <span>[ STRESS TEST // HARDWARE INJECT ]</span>
+          <span className="text-[#FFB000]">[ ANOMALY ]</span>
         </div>
 
-        <p className="text-xs text-slate-400 mb-3 leading-relaxed">
-          Inject real-world operational failure scenarios to observe dynamic hydro-thermal decay and automated SCADA alarms:
+        <p className="text-[11px] text-neutral-400 mb-4 leading-relaxed font-sans">
+          Inject physical thermodynamic failures to stress test the biophysical digital twin calculations:
         </p>
 
         <div className="grid grid-cols-2 gap-2">
-          {/* Door Ajar */}
           <button
             onClick={() => handleAction("DOOR_OPEN")}
             disabled={loadingAction !== null}
-            className="p-2.5 rounded-xl bg-[#141e2e] hover:bg-[#1a293d] border border-amber-500/30 hover:border-amber-400 text-left transition-all group cursor-pointer"
+            className="p-3 border border-[#262626] bg-[#111111] hover:border-[#FFB000] hover:text-[#FFB000] transition-colors duration-100 text-left cursor-pointer"
           >
-            <div className="flex items-center gap-2 text-amber-400 font-mono text-xs font-medium mb-1">
-              <DoorOpen className="w-3.5 h-3.5" />
-              <span>Door Ajar Leak</span>
+            <div className="text-[10px] text-white font-bold uppercase tracking-wider">
+              [+] DOOR LEAK
             </div>
-            <div className="text-[10px] text-slate-400 font-mono">
-              +3.2°C Temp, -14% RH
+            <div className="text-[9px] text-neutral-400 mt-1">
+              +3.2°C / -14% RH
             </div>
           </button>
 
-          {/* Compressor Trip */}
           <button
             onClick={() => handleAction("COOLING_FAIL")}
             disabled={loadingAction !== null}
-            className="p-2.5 rounded-xl bg-[#141e2e] hover:bg-[#1a293d] border border-rose-500/30 hover:border-rose-400 text-left transition-all group cursor-pointer"
+            className="p-3 border border-[#262626] bg-[#111111] hover:border-[#FF3333] hover:text-[#FF3333] transition-colors duration-100 text-left cursor-pointer"
           >
-            <div className="flex items-center gap-2 text-rose-400 font-mono text-xs font-medium mb-1">
-              <AlertTriangle className="w-3.5 h-3.5" />
-              <span>Compressor Trip</span>
+            <div className="text-[10px] text-white font-bold uppercase tracking-wider">
+              [+] CHILLER TRIP
             </div>
-            <div className="text-[10px] text-slate-400 font-mono">
-              Chiller failure, +6.5°C
+            <div className="text-[9px] text-neutral-400 mt-1">
+              +6.5°C / COMP FAIL
             </div>
           </button>
 
-          {/* Ethylene Spike */}
           <button
             onClick={() => handleAction("ETHYLENE_SPIKE")}
             disabled={loadingAction !== null}
-            className="p-2.5 rounded-xl bg-[#141e2e] hover:bg-[#1a293d] border border-purple-500/30 hover:border-purple-400 text-left transition-all group cursor-pointer"
+            className="p-3 border border-[#262626] bg-[#111111] hover:border-[#FFB000] hover:text-[#FFB000] transition-colors duration-100 text-left cursor-pointer"
           >
-            <div className="flex items-center gap-2 text-purple-400 font-mono text-xs font-medium mb-1">
-              <Zap className="w-3.5 h-3.5" />
-              <span>Ethylene Surge</span>
+            <div className="text-[10px] text-white font-bold uppercase tracking-wider">
+              [+] C₂H₄ SURGE
             </div>
-            <div className="text-[10px] text-slate-400 font-mono">
-              +0.65 ppm gas surge
+            <div className="text-[9px] text-neutral-400 mt-1">
+              +0.65 ppm BURST
             </div>
           </button>
 
-          {/* Restore Optimal */}
           <button
             onClick={() => handleAction("RESTORE_OPTIMAL")}
             disabled={loadingAction !== null}
-            className="p-2.5 rounded-xl bg-[#141e2e] hover:bg-[#1a293d] border border-emerald-500/30 hover:border-emerald-400 text-left transition-all group cursor-pointer"
+            className="p-3 border border-[#262626] bg-[#111111] hover:bg-white hover:text-black transition-colors duration-100 text-left cursor-pointer"
           >
-            <div className="flex items-center gap-2 text-emerald-400 font-mono text-xs font-medium mb-1">
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Restore Optimal</span>
+            <div className="text-[10px] text-white font-bold uppercase tracking-wider">
+              [*] CALIBRATE
             </div>
-            <div className="text-[10px] text-slate-400 font-mono">
-              Reset target setpoints
+            <div className="text-[9px] text-neutral-400 mt-1">
+              RESTORE DESIGN
             </div>
           </button>
         </div>
 
-        {/* Configure Thresholds Button */}
         <button
           onClick={() => openThresholdEditor(bin)}
-          className="w-full mt-3 py-2 px-3 rounded-xl bg-[#141e2e] hover:bg-[#1b283b] border border-[#23354c] hover:border-cyan-500/40 text-cyan-300 text-xs font-mono font-medium flex items-center justify-center gap-2 transition-all cursor-pointer"
+          className="w-full mt-4 py-2.5 px-4 border border-[#262626] bg-[#EDEDED] text-black hover:bg-[#00FF66] transition-colors duration-100 text-xs font-bold uppercase tracking-wider cursor-pointer"
         >
-          <Sliders className="w-3.5 h-3.5" />
-          <span>Edit Bin Safety Thresholds</span>
+          [ CONFIGURE THRESHOLD LIMITS ]
         </button>
       </div>
     </div>

@@ -1,46 +1,40 @@
 import React from "react";
-import { CheckCircle2, AlertTriangle, AlertOctagon, HelpCircle } from "lucide-react";
 
 export function StatusBadge({ status, size = "md" }) {
   const normStatus = (status || "").toUpperCase();
 
   const configs = {
     NOMINAL: {
-      bg: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400",
-      dot: "bg-emerald-400",
-      icon: CheckCircle2,
-      label: "NOMINAL"
+      bracket: "[ STATUS // NOMINAL ]",
+      pipColor: "text-[#00FF66]",
+      border: "border-[#262626] bg-[#0F0F0F] text-[#00FF66]"
     },
     WARNING: {
-      bg: "bg-amber-500/10 border-amber-500/30 text-amber-400",
-      dot: "bg-amber-400",
-      icon: AlertTriangle,
-      label: "WARNING"
+      bracket: "[ ALERT // WARNING ]",
+      pipColor: "text-[#FFB000]",
+      border: "border-[#FFB000]/40 bg-[#161208] text-[#FFB000]"
     },
     CRITICAL: {
-      bg: "bg-rose-500/10 border-rose-500/30 text-rose-400",
-      dot: "bg-rose-400",
-      icon: AlertOctagon,
-      label: "CRITICAL"
+      bracket: "[ FAULT // CRITICAL ]",
+      pipColor: "text-[#FF3333]",
+      border: "border-[#FF3333]/50 bg-[#1A0A0A] text-[#FF3333]"
     },
     OFFLINE: {
-      bg: "bg-slate-500/10 border-slate-500/30 text-slate-400",
-      dot: "bg-slate-400",
-      icon: HelpCircle,
-      label: "OFFLINE"
+      bracket: "[ NODE // OFFLINE ]",
+      pipColor: "text-neutral-500",
+      border: "border-neutral-800 bg-[#0F0F0F] text-neutral-400"
     }
   };
 
   const config = configs[normStatus] || configs.NOMINAL;
-  const Icon = config.icon;
-
-  const sizeClasses = size === "sm" ? "px-2 py-0.5 text-xs gap-1" : "px-2.5 py-1 text-xs font-medium gap-1.5";
+  const sizeClass = size === "sm" ? "text-[10px] py-0.5 px-2 tracking-widest" : "text-[11px] py-1 px-2.5 tracking-widest";
 
   return (
-    <span className={`inline-flex items-center rounded-full border ${config.bg} ${sizeClasses}`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${config.dot} animate-pulse`} />
-      <Icon className="w-3.5 h-3.5" />
-      <span>{config.label}</span>
+    <span
+      className={`inline-flex items-center gap-1.5 font-mono font-medium uppercase border rounded-none select-none ${config.border} ${sizeClass}`}
+    >
+      <span className={`text-[9px] ${config.pipColor} animate-pulse`}>■</span>
+      <span>{config.bracket}</span>
     </span>
   );
 }

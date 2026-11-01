@@ -1,16 +1,4 @@
 import React from "react";
-import {
-  Boxes,
-  Thermometer,
-  Droplets,
-  Wind,
-  ShieldCheck,
-  AlertTriangle,
-  Play,
-  RotateCcw,
-  Sparkles,
-  ArrowRight
-} from "lucide-react";
 import { MetricCard } from "./MetricCard";
 import { BinCard } from "./BinCard";
 import { useTelemetry } from "../../context/TelemetryContext";
@@ -34,139 +22,133 @@ export function OverviewView() {
   ).length;
 
   return (
-    <div className="space-y-6">
-      {/* Page Title & Subtitle */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="space-y-8 select-none">
+      {/* Editorial Page Title & Mechanical Trigger Bar */}
+      <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 pb-6 border-b border-[#262626]">
         <div>
-          <h2 className="text-xl lg:text-2xl font-bold text-white tracking-tight font-mono flex items-center gap-2">
-            Facility Overview & Telemetry Matrix
+          <div className="font-mono text-[10px] uppercase tracking-widest text-neutral-400 mb-1 flex items-center gap-2">
+            <span className="text-[#00FF66]">■</span>
+            <span>SYSTEM DIRECTORY // 01 // CONTROL MATRIX</span>
+          </div>
+          <h2 className="font-serif italic text-3xl lg:text-5xl text-white font-normal tracking-tight">
+            Facility Telemetry Matrix
           </h2>
-          <p className="text-sm text-slate-400 mt-0.5">
-            Real-time hydro-thermal monitoring & Shelf-Life Index (SLI) telemetry across 5 active post-harvest bins
+          <p className="font-mono text-xs text-neutral-400 mt-1 uppercase tracking-wider">
+            Real-time hydro-thermal digital twin telemetry across 5 active post-harvest chambers
           </p>
         </div>
 
-        {/* Quick Simulation Injector Dock */}
-        <div className="flex items-center gap-2 bg-[#121c2b] border border-[#203147] p-1.5 rounded-xl">
-          <span className="text-[11px] font-mono uppercase text-slate-400 px-2 flex items-center gap-1">
-            <Sparkles className="w-3 h-3 text-cyan-400" />
-            Quick Anomaly Inject:
+        {/* Mechanical Anomaly Injector Switchboard */}
+        <div className="flex items-center gap-2 p-1.5 border border-[#262626] bg-[#0E0E0E] font-mono text-[11px] shrink-0">
+          <span className="text-neutral-400 uppercase tracking-widest px-2 hidden sm:inline">
+            [ INJECT ]:
           </span>
           <button
             onClick={() => triggerEvent("BIN-02", "ETHYLENE_SPIKE")}
-            className="px-2.5 py-1 text-xs rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 transition-all font-mono cursor-pointer"
-            title="Inject 0.65 ppm ethylene spike into Ripening Chamber Beta"
+            className="px-2.5 py-1 border border-[#262626] bg-[#141414] text-[#FFB000] hover:bg-[#FFB000] hover:text-black uppercase tracking-wider transition-colors duration-100 cursor-pointer"
           >
-            +C₂H₄ Spike
+            +C₂H₄ SPIKE
           </button>
           <button
             onClick={() => triggerEvent("BIN-01", "DOOR_OPEN")}
-            className="px-2.5 py-1 text-xs rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 transition-all font-mono cursor-pointer"
-            title="Simulate door ajar thermal leak in Cold Room Alpha"
+            className="px-2.5 py-1 border border-[#262626] bg-[#141414] text-[#FFB000] hover:bg-[#FFB000] hover:text-black uppercase tracking-wider transition-colors duration-100 cursor-pointer"
           >
-            +Door Leak
+            +DOOR LEAK
           </button>
           <button
             onClick={() => triggerEvent("BIN-01", "RESTORE_OPTIMAL")}
-            className="px-2 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all font-mono cursor-pointer"
-            title="Restore ideal cold storage setpoints"
+            className="px-2.5 py-1 border border-[#262626] bg-[#141414] text-neutral-300 hover:bg-white hover:text-black uppercase tracking-wider transition-colors duration-100 cursor-pointer"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
+            CALIBRATE
           </button>
         </div>
       </div>
 
-      {/* 5 SUMMARY METRIC CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      {/* 5 SUMMARY METRIC CARDS (Strict 60-30-10 Swiss Grid) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-px bg-[#262626] border border-[#262626]">
         {/* 1. Active Bins */}
         <MetricCard
-          title="Active Storage Bins"
-          value={summary ? `${summary.activeBins} / ${summary.totalBins}` : `${bins.length} / ${bins.length}`}
+          index="01"
+          title="ACTIVE UNITS"
+          value={summary ? `${summary.activeBins}/${summary.totalBins}` : `${bins.length}/${bins.length}`}
           unit="CHAMBERS"
-          icon={Boxes}
-          accentColor="cyan"
-          trend="flat"
-          trendLabel="100% Online"
+          trendLabel="100% ONLINE"
           trendType="positive"
-          subtext="5/5 Micro-zones active"
+          subtext="ALL CELLS OPERATIONAL"
+          signalColor="green"
         />
 
-        {/* 2. Average Temperature */}
+        {/* 2. Mean Temperature */}
         <MetricCard
-          title="Avg Chamber Temp"
+          index="02"
+          title="MEAN TEMP"
           value={summary ? summary.avgTemperature.toFixed(1) : "6.7"}
           unit="°C"
-          icon={Thermometer}
-          accentColor="emerald"
-          trend="up"
-          trendLabel="Optimal Range"
+          trendLabel="NORMAL RANGE"
           trendType="positive"
-          subtext="Setpoints: 0.5°C to 14.5°C"
+          subtext="BOUNDS: 0.5°C TO 14.5°C"
+          signalColor="green"
         />
 
-        {/* 3. Average Humidity */}
+        {/* 3. Mean Humidity */}
         <MetricCard
-          title="Avg Relative Humidity"
+          index="03"
+          title="MEAN HUMIDITY"
           value={summary ? summary.avgHumidity.toFixed(1) : "90.5"}
           unit="%"
-          icon={Droplets}
-          accentColor="cyan"
-          trend="flat"
-          trendLabel="High Moisture"
+          trendLabel="PREVENTS DRY"
           trendType="positive"
-          subtext="Prevents Produce Desiccation"
+          subtext="VPD DEFICIT OPTIMIZED"
+          signalColor="green"
         />
 
         {/* 4. Ethylene Spikes */}
         <MetricCard
-          title="Ethylene Spikes"
+          index="04"
+          title="ETHYLENE SPIKES"
           value={summary ? `${summary.warningCount + ethyleneSpikes}` : `${ethyleneSpikes}`}
           unit="ACTIVE"
-          icon={Wind}
-          accentColor={ethyleneSpikes > 0 ? "amber" : "emerald"}
-          trend={ethyleneSpikes > 0 ? "up" : "flat"}
-          trendLabel={ethyleneSpikes > 0 ? "Surge Warning" : "Nominal"}
+          trendLabel={ethyleneSpikes > 0 ? "SURGE DETECTED" : "NOMINAL"}
           trendType={ethyleneSpikes > 0 ? "warning" : "positive"}
-          subtext={ethyleneSpikes > 0 ? "Ripening chamber threshold" : "Zero hazardous leaks"}
+          subtext={ethyleneSpikes > 0 ? "SCRUBBERS ENGAGED" : "ZERO FLUX DETECTED"}
+          signalColor={ethyleneSpikes > 0 ? "amber" : "green"}
         />
 
         {/* 5. Overall Inventory Health */}
         <MetricCard
-          title="Overall Inventory Health"
+          index="05"
+          title="INVENTORY SLI"
           value={summary ? `${summary.avgSli.toFixed(0)}%` : "85%"}
           unit="SLI"
-          icon={ShieldCheck}
-          accentColor="purple"
-          trend="down"
-          trendLabel="Grade A Export"
+          trendLabel="GRADE A EXPORT"
           trendType="positive"
-          subtext={`$${summary ? (summary.totalInventoryValueUsd / 1000).toFixed(0) : "193"}k Total Pallet Value`}
+          subtext={`$${summary ? (summary.totalInventoryValueUsd / 1000).toFixed(0) : "193"}K VALUATION`}
+          signalColor="white"
         />
       </div>
 
-      {/* QUICK STATUS HEALTH GRIDS */}
+      {/* STORAGE CHAMBER TELEMETRY GRID */}
       <div>
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-base font-bold text-white font-mono flex items-center gap-2">
-              <span>Storage Chambers SCADA Matrix</span>
-              <span className="text-xs font-normal text-slate-400 font-sans">
-                (Click any bin to open multi-axis Recharts & digital twin diagnostics)
-              </span>
-            </h3>
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#262626]">
+          <div className="font-mono text-xs uppercase tracking-widest text-neutral-400">
+            [ SECTION // 02 ] // STORAGE CHAMBER CONTROL TERMINALS
           </div>
           <button
             onClick={() => setActiveTab("bins")}
-            className="text-xs text-cyan-400 hover:text-cyan-300 font-mono font-medium flex items-center gap-1 hover:underline cursor-pointer"
+            className="font-mono text-xs uppercase tracking-widest text-white hover:text-[#00FF66] transition-colors duration-100 flex items-center gap-1 cursor-pointer"
           >
-            <span>Full Detail View</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <span>EXPAND ALL DIAGNOSTICS &rarr;</span>
           </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {bins.map(bin => (
-            <BinCard key={bin.id} bin={bin} onInspect={handleInspectBin} />
+          {bins.map((bin, idx) => (
+            <BinCard
+              key={bin.id}
+              bin={bin}
+              index={`0${idx + 1}`}
+              onInspect={handleInspectBin}
+            />
           ))}
         </div>
       </div>

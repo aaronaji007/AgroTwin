@@ -1,15 +1,4 @@
 import React, { useState, useEffect } from "react";
-import {
-  X,
-  Sliders,
-  CheckCircle,
-  Thermometer,
-  Droplets,
-  Wind,
-  Save,
-  RotateCcw,
-  Sparkles
-} from "lucide-react";
 import { useTelemetry } from "../../context/TelemetryContext";
 
 export function ThresholdModal() {
@@ -52,11 +41,11 @@ export function ThresholdModal() {
         maxHumidity: parseFloat(maxHumidity),
         maxEthylene: parseFloat(maxEthylene)
       });
-      setSuccessMsg("Threshold limits updated successfully!");
+      setSuccessMsg("[ LIMITS COMMITTED SUCCESSFULLY ]");
       setTimeout(() => {
         setIsThresholdModalOpen(false);
         setSuccessMsg("");
-      }, 700);
+      }, 500);
     } catch (err) {
       console.error("Save threshold error:", err);
     } finally {
@@ -93,148 +82,133 @@ export function ThresholdModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="w-full max-w-lg bg-[#0d1421] border border-[#23354c] rounded-2xl shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 select-none font-mono">
+      <div className="w-full max-w-lg bg-[#0A0A0A] border border-[#404040]">
         {/* Header */}
-        <div className="p-4 border-b border-[#1e2d42] flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
-              <Sliders className="w-4 h-4" />
+        <div className="p-4 border-b border-[#262626] flex items-center justify-between bg-[#0E0E0E]">
+          <div>
+            <div className="text-[10px] uppercase tracking-widest text-neutral-400">
+              [ SAFETY LIMIT CONFIGURATION // {targetConfigBin.code} ]
             </div>
-            <div>
-              <h3 className="font-bold text-white text-sm font-mono flex items-center gap-2">
-                <span>Configure Safety Thresholds</span>
-                <span className="text-xs px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800">
-                  {targetConfigBin.code}
-                </span>
-              </h3>
-              <p className="text-xs text-slate-400">
-                {targetConfigBin.name} • {targetConfigBin.produceName}
-              </p>
-            </div>
+            <h3 className="font-serif italic text-2xl text-white font-normal mt-0.5 tracking-tight">
+              {targetConfigBin.name}
+            </h3>
           </div>
           <button
             onClick={() => setIsThresholdModalOpen(false)}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#15202f] transition-colors cursor-pointer"
+            className="px-2 py-1 border border-[#262626] bg-[#141414] text-neutral-400 hover:text-white uppercase text-xs cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            [ X ]
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSave} className="p-5 space-y-4">
-          {/* Preset Buttons */}
+        <form onSubmit={handleSave} className="p-6 space-y-5">
+          {/* Presets */}
           <div>
-            <span className="text-xs font-mono text-slate-400 block mb-1.5 flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-cyan-400" />
-              Quick Commodity Presets:
+            <span className="text-[10px] uppercase tracking-widest text-neutral-400 block mb-2">
+              COMMODITY TARGET PRESETS:
             </span>
-            <div className="grid grid-cols-4 gap-2 text-xs font-mono">
+            <div className="grid grid-cols-4 gap-1 text-[11px]">
               <button
                 type="button"
                 onClick={() => applyPreset("APPLES")}
-                className="py-1 px-2 rounded-lg bg-[#141e2e] hover:bg-[#1b283b] border border-[#203147] text-slate-300 hover:text-cyan-300 transition-colors cursor-pointer text-center"
+                className="py-1.5 px-2 border border-[#262626] bg-[#111111] text-neutral-300 hover:border-white hover:text-white cursor-pointer uppercase text-center"
               >
-                Apples CA
+                APPLES CA
               </button>
               <button
                 type="button"
                 onClick={() => applyPreset("BANANAS")}
-                className="py-1 px-2 rounded-lg bg-[#141e2e] hover:bg-[#1b283b] border border-[#203147] text-slate-300 hover:text-cyan-300 transition-colors cursor-pointer text-center"
+                className="py-1.5 px-2 border border-[#262626] bg-[#111111] text-neutral-300 hover:border-white hover:text-white cursor-pointer uppercase text-center"
               >
-                Banana Ripen
+                BANANA
               </button>
               <button
                 type="button"
                 onClick={() => applyPreset("AVOCADOS")}
-                className="py-1 px-2 rounded-lg bg-[#141e2e] hover:bg-[#1b283b] border border-[#203147] text-slate-300 hover:text-cyan-300 transition-colors cursor-pointer text-center"
+                className="py-1.5 px-2 border border-[#262626] bg-[#111111] text-neutral-300 hover:border-white hover:text-white cursor-pointer uppercase text-center"
               >
-                Avocado Set
+                AVOCADO
               </button>
               <button
                 type="button"
                 onClick={() => applyPreset("BERRIES")}
-                className="py-1 px-2 rounded-lg bg-[#141e2e] hover:bg-[#1b283b] border border-[#203147] text-slate-300 hover:text-cyan-300 transition-colors cursor-pointer text-center"
+                className="py-1.5 px-2 border border-[#262626] bg-[#111111] text-neutral-300 hover:border-white hover:text-white cursor-pointer uppercase text-center"
               >
-                Hydro Berry
+                BERRIES
               </button>
             </div>
           </div>
 
           {/* Temperature Bounds */}
-          <div className="p-3 rounded-xl bg-[#121c2a] border border-[#1e2e42] space-y-2">
-            <div className="flex items-center gap-2 text-xs font-mono text-cyan-400 font-semibold">
-              <Thermometer className="w-4 h-4" />
-              <span>Temperature Bounds (°C)</span>
+          <div className="p-4 border border-[#202020] bg-[#0E0E0E] space-y-2">
+            <div className="text-[10px] uppercase tracking-widest text-white font-bold">
+              01. THERMAL TOLERANCES (°C)
             </div>
-            <div className="grid grid-cols-2 gap-3 text-xs font-mono">
+            <div className="grid grid-cols-2 gap-3 text-xs">
               <div>
-                <label className="text-slate-400 text-[11px] block mb-1">Min Safe Temp (°C)</label>
+                <label className="text-neutral-400 text-[10px] uppercase block mb-1">MIN TEMP (°C)</label>
                 <input
                   type="number"
                   step="0.1"
                   value={minTemp}
                   onChange={(e) => setMinTemp(e.target.value)}
-                  className="w-full bg-[#0a0e16] border border-[#23354c] rounded-lg px-3 py-1.5 text-white font-mono focus:outline-none focus:border-cyan-400"
+                  className="w-full bg-[#050505] border border-[#262626] px-3 py-1.5 text-white font-mono focus:outline-none focus:border-white"
                   required
                 />
               </div>
               <div>
-                <label className="text-slate-400 text-[11px] block mb-1">Max Safe Temp (°C)</label>
+                <label className="text-neutral-400 text-[10px] uppercase block mb-1">MAX TEMP (°C)</label>
                 <input
                   type="number"
                   step="0.1"
                   value={maxTemp}
                   onChange={(e) => setMaxTemp(e.target.value)}
-                  className="w-full bg-[#0a0e16] border border-[#23354c] rounded-lg px-3 py-1.5 text-white font-mono focus:outline-none focus:border-cyan-400"
+                  className="w-full bg-[#050505] border border-[#262626] px-3 py-1.5 text-white font-mono focus:outline-none focus:border-white"
                   required
                 />
               </div>
             </div>
           </div>
 
-          {/* Relative Humidity Bounds */}
-          <div className="p-3 rounded-xl bg-[#121c2a] border border-[#1e2e42] space-y-2">
-            <div className="flex items-center gap-2 text-xs font-mono text-blue-400 font-semibold">
-              <Droplets className="w-4 h-4" />
-              <span>Relative Humidity Bounds (%)</span>
+          {/* Humidity Bounds */}
+          <div className="p-4 border border-[#202020] bg-[#0E0E0E] space-y-2">
+            <div className="text-[10px] uppercase tracking-widest text-white font-bold">
+              02. RELATIVE HUMIDITY TOLERANCES (%)
             </div>
-            <div className="grid grid-cols-2 gap-3 text-xs font-mono">
+            <div className="grid grid-cols-2 gap-3 text-xs">
               <div>
-                <label className="text-slate-400 text-[11px] block mb-1">Min RH (%)</label>
+                <label className="text-neutral-400 text-[10px] uppercase block mb-1">MIN RH (%)</label>
                 <input
                   type="number"
                   step="0.5"
                   value={minHumidity}
                   onChange={(e) => setMinHumidity(e.target.value)}
-                  className="w-full bg-[#0a0e16] border border-[#23354c] rounded-lg px-3 py-1.5 text-white font-mono focus:outline-none focus:border-blue-400"
+                  className="w-full bg-[#050505] border border-[#262626] px-3 py-1.5 text-white font-mono focus:outline-none focus:border-white"
                   required
                 />
               </div>
               <div>
-                <label className="text-slate-400 text-[11px] block mb-1">Max RH (%)</label>
+                <label className="text-neutral-400 text-[10px] uppercase block mb-1">MAX RH (%)</label>
                 <input
                   type="number"
                   step="0.5"
                   value={maxHumidity}
                   onChange={(e) => setMaxHumidity(e.target.value)}
-                  className="w-full bg-[#0a0e16] border border-[#23354c] rounded-lg px-3 py-1.5 text-white font-mono focus:outline-none focus:border-blue-400"
+                  className="w-full bg-[#050505] border border-[#262626] px-3 py-1.5 text-white font-mono focus:outline-none focus:border-white"
                   required
                 />
               </div>
             </div>
           </div>
 
-          {/* Ethylene Gas Max Limit */}
-          <div className="p-3 rounded-xl bg-[#121c2a] border border-[#1e2e42] space-y-2">
-            <div className="flex items-center gap-2 text-xs font-mono text-purple-400 font-semibold">
-              <Wind className="w-4 h-4" />
-              <span>Ethylene Gas Concentration Ceiling (ppm)</span>
+          {/* Ethylene Ceiling */}
+          <div className="p-4 border border-[#202020] bg-[#0E0E0E] space-y-2">
+            <div className="text-[10px] uppercase tracking-widest text-white font-bold">
+              03. ETHYLENE GAS CEILING (PPM)
             </div>
             <div>
-              <label className="text-slate-400 text-[11px] font-mono block mb-1">
-                Alarm Trigger Threshold (ppm)
-              </label>
               <input
                 type="number"
                 step="0.01"
@@ -242,39 +216,36 @@ export function ThresholdModal() {
                 max="5.0"
                 value={maxEthylene}
                 onChange={(e) => setMaxEthylene(e.target.value)}
-                className="w-full bg-[#0a0e16] border border-[#23354c] rounded-lg px-3 py-1.5 text-white font-mono focus:outline-none focus:border-purple-400 text-xs"
+                className="w-full bg-[#050505] border border-[#262626] px-3 py-1.5 text-white font-mono focus:outline-none focus:border-white text-xs"
                 required
               />
-              <span className="text-[10px] text-slate-400 font-mono mt-1 block">
-                Exceeding this value triggers the chamber catalytic scrubber and dispatches a SCADA warning.
+              <span className="text-[9px] text-neutral-400 mt-1 block uppercase">
+                Exceeding this value trips automated catalytic scrubbers and logs an incident alarm.
               </span>
             </div>
           </div>
 
-          {/* Success message banner */}
           {successMsg && (
-            <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono flex items-center gap-2">
-              <CheckCircle className="w-4 h-4" />
-              <span>{successMsg}</span>
+            <div className="p-3 border border-[#00FF66] bg-[#0A160E] text-[#00FF66] text-xs uppercase text-center font-bold">
+              {successMsg}
             </div>
           )}
 
           {/* Modal Actions */}
-          <div className="pt-2 flex items-center justify-end gap-2">
+          <div className="pt-2 flex items-center justify-end gap-2 text-xs">
             <button
               type="button"
               onClick={() => setIsThresholdModalOpen(false)}
-              className="px-4 py-2 rounded-xl bg-[#141e2e] hover:bg-[#1b283b] border border-[#203147] text-slate-300 font-mono text-xs transition-colors cursor-pointer"
+              className="px-4 py-2 border border-[#262626] bg-[#111111] text-neutral-400 hover:text-white uppercase cursor-pointer"
             >
-              Cancel
+              [ CANCEL ]
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="px-5 py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/50 hover:border-cyan-400 font-mono text-xs font-bold transition-all shadow-[0_0_15px_rgba(0,210,255,0.15)] flex items-center gap-1.5 cursor-pointer"
+              className="px-6 py-2 border border-[#262626] bg-[#EDEDED] text-black hover:bg-[#00FF66] font-bold uppercase cursor-pointer"
             >
-              <Save className="w-3.5 h-3.5" />
-              <span>{saving ? "Updating..." : "Commit Thresholds"}</span>
+              {saving ? "[ COMMITTING... ]" : "[ COMMIT LIMITS ]"}
             </button>
           </div>
         </form>
