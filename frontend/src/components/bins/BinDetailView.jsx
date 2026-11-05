@@ -143,6 +143,53 @@ export function BinDetailView() {
             </div>
           </div>
         </div>
+
+        {/* PHYSICAL SENSOR CLUSTER (ESP32 HARDWARE LINK) */}
+        {selectedBin.hardware && (
+          <div className="mt-5 pt-4 border-t border-[#202020] flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 font-mono text-xs">
+            <div className="flex items-center gap-3">
+              <span className="w-2 h-2 bg-[#00FF66] rounded-full animate-pulse"></span>
+              <span className="text-neutral-400">
+                ESP32 NODE: <strong className="text-white">{selectedBin.hardware.esp32DeviceId}</strong>
+              </span>
+              <span className="text-neutral-600">//</span>
+              <span className="text-neutral-400">
+                WIFI: <strong className="text-[#00FF66]">{selectedBin.hardware.wifiRssiDbm} dBm</strong>
+              </span>
+              <span className="text-neutral-600">//</span>
+              <span className="text-neutral-400">
+                UPTIME: <strong className="text-neutral-300">{Math.floor(selectedBin.hardware.uptimeSeconds / 60)}m</strong>
+              </span>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 text-[11px]">
+              {/* DHT11 */}
+              <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[#141414] border border-[#262626]">
+                <span className="text-neutral-400 font-bold">DHT11:</span>
+                <span className="text-white font-bold">{selectedBin.hardware.dht11.tempC}°C / {selectedBin.hardware.dht11.rhPct}%</span>
+                <span className="text-[9px] text-[#00FF66] font-bold">[{selectedBin.hardware.dht11.status}]</span>
+              </div>
+
+              {/* MQ Gas */}
+              <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[#141414] border border-[#262626]">
+                <span className="text-neutral-400 font-bold">MQ-135:</span>
+                <span className="text-[#FFB000] font-bold">{selectedBin.hardware.gas.ppm} ppm</span>
+                <span className="text-neutral-400 text-[10px]">({selectedBin.hardware.gas.rawAdc} ADC)</span>
+                <span className={`text-[9px] font-bold ${selectedBin.hardware.gas.status === "ONLINE" ? "text-[#00FF66]" : "text-[#FFB000]"}`}>
+                  [{selectedBin.hardware.gas.status}]
+                </span>
+              </div>
+
+              {/* HC-SR04 */}
+              <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[#141414] border border-[#262626]">
+                <span className="text-neutral-400 font-bold">HC-SR04:</span>
+                <span className="text-white font-bold">{selectedBin.hardware.ultrasonic.distanceCm} cm</span>
+                <span className="text-[#93C5FD] font-bold">({selectedBin.hardware.ultrasonic.fillLevelPct}% fill)</span>
+                <span className="text-[9px] text-[#00FF66] font-bold">[{selectedBin.hardware.ultrasonic.status}]</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 3. Grid: Oscilloscope Charts (2 cols), Actuator Relays (1 col) */}

@@ -9,6 +9,7 @@ import {
   updateBinThresholds as apiUpdateThresholds,
   simulateBinEvent as apiSimulateEvent,
   acknowledgeAlert as apiAckAlert,
+  ingestESP32Telemetry,
   mockStore
 } from "../services/api";
 
@@ -130,6 +131,18 @@ export function TelemetryProvider({ children }) {
     }
   };
 
+  const sendESP32Telemetry = async (packet) => {
+    try {
+      const updatedBin = await ingestESP32Telemetry(packet);
+      setBins(prev => prev.map(b => b.id === updatedBin.id ? updatedBin : b));
+      setLastPulse(Date.now());
+      return updatedBin;
+    } catch (err) {
+      console.error("Failed to send ESP32 telemetry:", err);
+      throw err;
+    }
+  };
+
   const openThresholdEditor = (bin) => {
     setTargetConfigBin(bin);
     setIsThresholdModalOpen(true);
@@ -162,6 +175,7 @@ export function TelemetryProvider({ children }) {
         isThresholdModalOpen,
         setIsThresholdModalOpen,
         targetConfigBin,
+        sendESP32Telemetry,
         openThresholdEditor,
         refreshData: loadAllData
       }}

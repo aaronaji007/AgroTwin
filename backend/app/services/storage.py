@@ -2,7 +2,7 @@ import math
 import random
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
-from ..models.schemas import StorageBin, ProduceBatch, ThresholdConfig, TelemetryPoint, BinStatus, ProduceCategory
+from ..models.schemas import StorageBin, ProduceBatch, ThresholdConfig, TelemetryPoint, BinStatus, ProduceCategory, DHT11SensorState, GasSensorState, UltrasonicSensorState, SensorClusterState, ESP32TelemetryIngest
 from .digital_twin_engine import DigitalTwinEngine
 
 class StorageService:
@@ -136,6 +136,15 @@ class StorageService:
                 sli=91.4,
                 vpd_kpa=DigitalTwinEngine.calculate_vpd(1.8, 92.1)
             ),
+            hardware=SensorClusterState(
+                esp32_device_id="ESP32-NODE-01",
+                dht11=DHT11SensorState(temp_c=1.8, rh_pct=92.1, status="ONLINE"),
+                gas=GasSensorState(sensor_type="MQ-135 / Ethylene", raw_adc=320, ppm=0.08, status="ONLINE"),
+                ultrasonic=UltrasonicSensorState(distance_cm=44.0, fill_level_pct=78.0, status="ONLINE"),
+                wifi_rssi_dbm=-56,
+                uptime_seconds=14200,
+                last_heartbeat=now
+            ),
             thresholds=ThresholdConfig(
                 min_temp=0.5,
                 max_temp=3.5,
@@ -170,6 +179,15 @@ class StorageService:
                 co2_ppm=1120.0,
                 sli=72.8,
                 vpd_kpa=DigitalTwinEngine.calculate_vpd(14.5, 88.4)
+            ),
+            hardware=SensorClusterState(
+                esp32_device_id="ESP32-NODE-02",
+                dht11=DHT11SensorState(temp_c=14.5, rh_pct=88.4, status="ONLINE"),
+                gas=GasSensorState(sensor_type="MQ-135 / Ethylene", raw_adc=1850, ppm=1.25, status="WARNING"),
+                ultrasonic=UltrasonicSensorState(distance_cm=22.0, fill_level_pct=89.0, status="ONLINE"),
+                wifi_rssi_dbm=-62,
+                uptime_seconds=28400,
+                last_heartbeat=now
             ),
             thresholds=ThresholdConfig(
                 min_temp=12.5,
@@ -206,6 +224,15 @@ class StorageService:
                 sli=85.0,
                 vpd_kpa=DigitalTwinEngine.calculate_vpd(5.2, 91.0)
             ),
+            hardware=SensorClusterState(
+                esp32_device_id="ESP32-NODE-03",
+                dht11=DHT11SensorState(temp_c=5.2, rh_pct=91.0, status="ONLINE"),
+                gas=GasSensorState(sensor_type="MQ-135 / Ethylene", raw_adc=490, ppm=0.12, status="WARNING"),
+                ultrasonic=UltrasonicSensorState(distance_cm=52.0, fill_level_pct=74.0, status="ONLINE"),
+                wifi_rssi_dbm=-51,
+                uptime_seconds=8900,
+                last_heartbeat=now
+            ),
             thresholds=ThresholdConfig(
                 min_temp=4.0,
                 max_temp=7.0,
@@ -241,6 +268,15 @@ class StorageService:
                 sli=96.2,
                 vpd_kpa=DigitalTwinEngine.calculate_vpd(0.8, 94.3)
             ),
+            hardware=SensorClusterState(
+                esp32_device_id="ESP32-NODE-04",
+                dht11=DHT11SensorState(temp_c=0.8, rh_pct=94.3, status="ONLINE"),
+                gas=GasSensorState(sensor_type="MQ-135 / Ethylene", raw_adc=210, ppm=0.04, status="ONLINE"),
+                ultrasonic=UltrasonicSensorState(distance_cm=16.0, fill_level_pct=92.0, status="ONLINE"),
+                wifi_rssi_dbm=-68,
+                uptime_seconds=5200,
+                last_heartbeat=now
+            ),
             thresholds=ThresholdConfig(
                 min_temp=0.0,
                 max_temp=2.2,
@@ -275,6 +311,15 @@ class StorageService:
                 co2_ppm=680.0,
                 sli=78.5,
                 vpd_kpa=DigitalTwinEngine.calculate_vpd(11.8, 86.5)
+            ),
+            hardware=SensorClusterState(
+                esp32_device_id="ESP32-NODE-05",
+                dht11=DHT11SensorState(temp_c=11.8, rh_pct=86.5, status="ONLINE"),
+                gas=GasSensorState(sensor_type="MQ-135 / Ethylene", raw_adc=820, ppm=0.35, status="ONLINE"),
+                ultrasonic=UltrasonicSensorState(distance_cm=35.0, fill_level_pct=82.5, status="ONLINE"),
+                wifi_rssi_dbm=-54,
+                uptime_seconds=36100,
+                last_heartbeat=now
             ),
             thresholds=ThresholdConfig(
                 min_temp=9.5,
@@ -386,6 +431,66 @@ class StorageService:
         bin_obj.thresholds = thresholds
         self._evaluate_bin_status(bin_obj)
         return bin_obj
+
+    def ingest_esp32_telemetry(self, packet: ESP32TelemetryIngest) -> Optional[StorageBin]:
+        """
+        Specialized ingestion pipeline for ESP32 microcontroller nodes streaming
+        DHT11, MQ gas sensors, and HC-SR04 ultrasonic distance sensors.
+        """
+        b = self.bins.get(packet.bin_id)
+        if not b:
+            return None
+
+        now = datetime.now()
+        
+        # 1. Resolve DHT11 metrics
+        temp = packet.dht11_temp if packet.dht11_temp is not None else (packet.temperature if packet.temperature is not None else b.telemetry.temperature)
+        rh = packet.dht11_humidity if packet.dht11_humidity is not None else (packet.humidity if packet.humidity is not None else b.telemetry.humidity)
+        
+        # 2. Resolve Gas sensor metrics (MQ series ADC / PPM)
+        raw_adc = packet.gas_raw if packet.gas_raw is not None else (b.hardware.gas.raw_adc if b.hardware else 350)
+        if packet.gas_ppm is not None:
+            gas_ppm = packet.gas_ppm
+        elif packet.ethylene_ppm is not None:
+            gas_ppm = packet.ethylene_ppm
+        elif packet.gas_raw is not None:
+            gas_ppm = round((packet.gas_raw / 4095.0) * 2.5, 3)
+        else:
+            gas_ppm = b.telemetry.ethylene_ppm
+
+        # 3. Resolve Ultrasonic sensor metrics (HC-SR04 distance & produce fill level)
+        if packet.ultrasonic_distance_cm is not None:
+            dist_cm = packet.ultrasonic_distance_cm
+        elif b.hardware and b.hardware.ultrasonic:
+            dist_cm = b.hardware.ultrasonic.distance_cm
+        else:
+            dist_cm = 45.0
+
+        if packet.fill_level_pct is not None:
+            fill_pct = packet.fill_level_pct
+        else:
+            fill_pct = max(0.0, min(100.0, round((1.0 - dist_cm / 200.0) * 100.0, 1)))
+
+        # 4. Update Hardware Cluster State
+        dht_status = "FAULT" if (temp < -10.0 or temp > 70.0 or rh < 10.0 or rh > 100.0) else "ONLINE"
+        gas_status = "CRITICAL" if gas_ppm > b.thresholds.max_ethylene * 2.0 else ("WARNING" if gas_ppm > b.thresholds.max_ethylene else "ONLINE")
+        ultra_status = "FAULT" if (dist_cm > 400.0 or dist_cm < 2.0) else "ONLINE"
+
+        uptime = packet.uptime_s or (b.hardware.uptime_seconds + 5 if b.hardware else 3600)
+        rssi = packet.rssi_dbm or (b.hardware.wifi_rssi_dbm if b.hardware else -58)
+
+        b.hardware = SensorClusterState(
+            esp32_device_id=packet.device_id or "ESP32-NODE-01",
+            dht11=DHT11SensorState(temp_c=round(temp, 1), rh_pct=round(rh, 1), status=dht_status),
+            gas=GasSensorState(sensor_type="MQ-135 / Ethylene", raw_adc=raw_adc, ppm=round(gas_ppm, 3), status=gas_status),
+            ultrasonic=UltrasonicSensorState(distance_cm=round(dist_cm, 1), fill_level_pct=round(fill_pct, 1), status=ultra_status),
+            wifi_rssi_dbm=rssi,
+            uptime_seconds=uptime,
+            last_heartbeat=now
+        )
+
+        # 5. Pipeline into core biophysical twin ingestion
+        return self.ingest_telemetry(b.id, temp, rh, gas_ppm, packet.co2_ppm)
 
     def ingest_telemetry(self, bin_id: str, temp: float, rh: float, eth: float, co2: Optional[float] = None) -> Optional[StorageBin]:
         b = self.bins.get(bin_id)

@@ -160,6 +160,54 @@ class MockDataStore {
     return this.applyTelemetryUpdate(binId, temperature, humidity, ethylenePpm);
   }
 
+  ingestESP32Packet(packet) {
+    const binId = packet.bin_id || packet.binId || "BIN-01";
+    const bin = this.bins.find(b => b.id === binId);
+    if (!bin) return null;
+
+    const temp = packet.dht11_temp !== undefined ? packet.dht11_temp : (packet.temperature !== undefined ? packet.temperature : bin.telemetry.temperature);
+    const rh = packet.dht11_humidity !== undefined ? packet.dht11_humidity : (packet.humidity !== undefined ? packet.humidity : bin.telemetry.humidity);
+
+    const rawAdc = packet.gas_raw !== undefined ? packet.gas_raw : (bin.hardware ? bin.hardware.gas.rawAdc : 350);
+    let gasPpm = bin.telemetry.ethylenePpm;
+    if (packet.gas_ppm !== undefined) gasPpm = packet.gas_ppm;
+    else if (packet.ethylene_ppm !== undefined) gasPpm = packet.ethylene_ppm;
+    else if (packet.gas_raw !== undefined) gasPpm = +( (rawAdc / 4095.0) * 2.5 ).toFixed(3);
+
+    const distCm = packet.ultrasonic_distance_cm !== undefined ? packet.ultrasonic_distance_cm : (bin.hardware ? bin.hardware.ultrasonic.distanceCm : 44.0);
+    const fillPct = packet.fill_level_pct !== undefined ? packet.fill_level_pct : Math.max(0, Math.min(100, +((1.0 - distCm / 200.0) * 100).toFixed(1)));
+
+    const now = new Date();
+    const dhtStatus = (temp < -10 || temp > 65 || rh < 10 || rh > 100) ? "FAULT" : "ONLINE";
+    const gasStatus = gasPpm > bin.thresholds.maxEthylene * 2.0 ? "CRITICAL" : (gasPpm > bin.thresholds.maxEthylene ? "WARNING" : "ONLINE");
+    const ultraStatus = (distCm > 400 || distCm < 2) ? "FAULT" : "ONLINE";
+
+    bin.hardware = {
+      esp32DeviceId: packet.device_id || packet.deviceId || (bin.hardware ? bin.hardware.esp32DeviceId : "ESP32-NODE-01"),
+      dht11: {
+        tempC: +temp.toFixed(1),
+        rhPct: +rh.toFixed(1),
+        status: dhtStatus
+      },
+      gas: {
+        sensorType: "MQ-135 / Ethylene",
+        rawAdc: Math.round(rawAdc),
+        ppm: +gasPpm.toFixed(3),
+        status: gasStatus
+      },
+      ultrasonic: {
+        distanceCm: +distCm.toFixed(1),
+        fillLevelPct: +fillPct.toFixed(1),
+        status: ultraStatus
+      },
+      wifiRssiDbm: packet.rssi_dbm !== undefined ? packet.rssi_dbm : (bin.hardware ? bin.hardware.wifiRssiDbm : -56),
+      uptimeSeconds: packet.uptime_s !== undefined ? packet.uptime_s : (bin.hardware ? bin.hardware.uptimeSeconds + 10 : 14200),
+      lastHeartbeat: now.toISOString()
+    };
+
+    return this.applyTelemetryUpdate(bin.id, temp, rh, gasPpm);
+  }
+
   applyTelemetryUpdate(binId, temp, rh, eth) {
     const bin = this.bins.find(b => b.id === binId);
     if (!bin) return null;
@@ -220,6 +268,14 @@ class MockDataStore {
       const newRh = Math.max(50, Math.min(99, bin.telemetry.humidity + dRh));
       const newEth = Math.max(0.01, bin.telemetry.ethylenePpm + dEth);
 
+      if (bin.hardware) {
+        bin.hardware.dht11.tempC = +newTemp.toFixed(1);
+        bin.hardware.dht11.rhPct = +newRh.toFixed(1);
+        bin.hardware.gas.ppm = +newEth.toFixed(3);
+        bin.hardware.gas.rawAdc = Math.min(4095, Math.max(120, Math.round((newEth / 2.5) * 4095)));
+        bin.hardware.uptimeSeconds += 2;
+        bin.hardware.lastHeartbeat = new Date().toISOString();
+      }
       this.applyTelemetryUpdate(bin.id, newTemp, newRh, newEth);
     });
     return [...this.bins];
@@ -352,6 +408,21 @@ export async function ingestTelemetry(packet) {
     })
   });
   if (!res.ok) throw new Error(`Backend error: ${res.statusText}`);
+  return normalizeBin(await res.json());
+}
+
+export async function ingestESP32Telemetry(packet) {
+  if (isMockEnabled()) {
+    const updated = mockStore.ingestESP32Packet(packet);
+    if (!updated) throw new Error("Target chamber not found");
+    return Promise.resolve(updated);
+  }
+  const res = await fetch(`${BACKEND_BASE_URL}/api/telemetry/esp32`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(packet)
+  });
+  if (!res.ok) throw new Error(`ESP32 Ingestion failed: ${res.statusText}`);
   return normalizeBin(await res.json());
 }
 
@@ -497,6 +568,28 @@ function normalizeBin(b) {
       maxHumidity: b.thresholds.max_humidity,
       maxEthylene: b.thresholds.max_ethylene
     },
+    hardware: b.hardware ? {
+      esp32DeviceId: b.hardware.esp32_device_id || b.hardware.esp32DeviceId || "ESP32-NODE-01",
+      dht11: {
+        tempC: b.hardware.dht11.temp_c !== undefined ? b.hardware.dht11.temp_c : b.hardware.dht11.tempC,
+        rhPct: b.hardware.dht11.rh_pct !== undefined ? b.hardware.dht11.rh_pct : b.hardware.dht11.rhPct,
+        status: b.hardware.dht11.status
+      },
+      gas: {
+        sensorType: b.hardware.gas.sensor_type || b.hardware.gas.sensorType || "MQ-135 / Ethylene",
+        rawAdc: b.hardware.gas.raw_adc !== undefined ? b.hardware.gas.raw_adc : b.hardware.gas.rawAdc,
+        ppm: b.hardware.gas.ppm,
+        status: b.hardware.gas.status
+      },
+      ultrasonic: {
+        distanceCm: b.hardware.ultrasonic.distance_cm !== undefined ? b.hardware.ultrasonic.distance_cm : b.hardware.ultrasonic.distanceCm,
+        fillLevelPct: b.hardware.ultrasonic.fill_level_pct !== undefined ? b.hardware.ultrasonic.fill_level_pct : b.hardware.ultrasonic.fillLevelPct,
+        status: b.hardware.ultrasonic.status
+      },
+      wifiRssiDbm: b.hardware.wifi_rssi_dbm !== undefined ? b.hardware.wifi_rssi_dbm : b.hardware.wifiRssiDbm,
+      uptimeSeconds: b.hardware.uptime_seconds !== undefined ? b.hardware.uptime_seconds : b.hardware.uptimeSeconds,
+      lastHeartbeat: b.hardware.last_heartbeat || b.hardware.lastHeartbeat
+    } : null,
     status: b.status,
     estimatedDaysRemaining: b.estimated_days_remaining,
     compressorActive: b.compressor_active,

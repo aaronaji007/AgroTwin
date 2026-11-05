@@ -114,6 +114,15 @@ export const INITIAL_BINS = [
       sli: 91.4,
       vpdKpa: calculateVPD(1.8, 92.1)
     },
+        hardware: {
+      esp32DeviceId: "ESP32-NODE-01",
+      dht11: { tempC: 1.8, rhPct: 92.1, status: "ONLINE" },
+      gas: { sensorType: "MQ-135 / Ethylene", rawAdc: 320, ppm: 0.08, status: "ONLINE" },
+      ultrasonic: { distanceCm: 44.0, fillLevelPct: 78.0, status: "ONLINE" },
+      wifiRssiDbm: -56,
+      uptimeSeconds: 14200,
+      lastHeartbeat: new Date().toISOString()
+    },
     thresholds: {
       minTemp: 0.5,
       maxTemp: 3.5,
@@ -147,6 +156,15 @@ export const INITIAL_BINS = [
       co2Ppm: 1120,
       sli: 72.8,
       vpdKpa: calculateVPD(14.5, 88.4)
+    },
+        hardware: {
+      esp32DeviceId: "ESP32-NODE-02",
+      dht11: { tempC: 14.5, rhPct: 88.4, status: "ONLINE" },
+      gas: { sensorType: "MQ-135 / Ethylene", rawAdc: 1850, ppm: 1.25, status: "WARNING" },
+      ultrasonic: { distanceCm: 22.0, fillLevelPct: 89.0, status: "ONLINE" },
+      wifiRssiDbm: -62,
+      uptimeSeconds: 28400,
+      lastHeartbeat: new Date().toISOString()
     },
     thresholds: {
       minTemp: 12.5,
@@ -182,6 +200,15 @@ export const INITIAL_BINS = [
       sli: 85.0,
       vpdKpa: calculateVPD(5.2, 91.0)
     },
+        hardware: {
+      esp32DeviceId: "ESP32-NODE-03",
+      dht11: { tempC: 5.2, rhPct: 91.0, status: "ONLINE" },
+      gas: { sensorType: "MQ-135 / Ethylene", rawAdc: 490, ppm: 0.12, status: "WARNING" },
+      ultrasonic: { distanceCm: 52.0, fillLevelPct: 74.0, status: "ONLINE" },
+      wifiRssiDbm: -51,
+      uptimeSeconds: 8900,
+      lastHeartbeat: new Date().toISOString()
+    },
     thresholds: {
       minTemp: 4.0,
       maxTemp: 7.0,
@@ -216,6 +243,15 @@ export const INITIAL_BINS = [
       sli: 96.2,
       vpdKpa: calculateVPD(0.8, 94.3)
     },
+        hardware: {
+      esp32DeviceId: "ESP32-NODE-04",
+      dht11: { tempC: 0.8, rhPct: 94.3, status: "ONLINE" },
+      gas: { sensorType: "MQ-135 / Ethylene", rawAdc: 210, ppm: 0.04, status: "ONLINE" },
+      ultrasonic: { distanceCm: 16.0, fillLevelPct: 92.0, status: "ONLINE" },
+      wifiRssiDbm: -68,
+      uptimeSeconds: 5200,
+      lastHeartbeat: new Date().toISOString()
+    },
     thresholds: {
       minTemp: 0.0,
       maxTemp: 2.2,
@@ -249,6 +285,15 @@ export const INITIAL_BINS = [
       co2Ppm: 680,
       sli: 78.5,
       vpdKpa: calculateVPD(11.8, 86.5)
+    },
+        hardware: {
+      esp32DeviceId: "ESP32-NODE-05",
+      dht11: { tempC: 11.8, rhPct: 86.5, status: "ONLINE" },
+      gas: { sensorType: "MQ-135 / Ethylene", rawAdc: 820, ppm: 0.35, status: "ONLINE" },
+      ultrasonic: { distanceCm: 35.0, fillLevelPct: 82.5, status: "ONLINE" },
+      wifiRssiDbm: -54,
+      uptimeSeconds: 36100,
+      lastHeartbeat: new Date().toISOString()
     },
     thresholds: {
       minTemp: 9.5,
