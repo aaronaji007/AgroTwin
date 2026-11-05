@@ -41,16 +41,40 @@ function DashboardContent() {
   );
 }
 
+function AppShell() {
+  const { isProximityAlertActive, isAudioMuted, toggleAudioMute } = useTelemetry();
+
+  return (
+    <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#0A0A0A] text-[#EDEDED] font-sans">
+      {/* NUCLEAR REACTOR PROXIMITY MELTDOWN BANNER (< 5.0 CM) */}
+      {isProximityAlertActive && (
+        <div className="bg-[#FF0033] text-black font-mono font-black text-xs py-2 px-4 flex items-center justify-between tracking-widest uppercase animate-pulse border-b-2 border-black z-50 shrink-0">
+          <span className="flex items-center gap-2">
+            <span className="text-base animate-bounce">☢</span>
+            <span>CRITICAL PROXIMITY ALERT // ULTRASONIC SENSOR &lt; 5.0 CM // PRODUCE COLLISION / OVERFILL IMMINENT</span>
+          </span>
+          <button
+            onClick={toggleAudioMute}
+            className="bg-black text-[#FF0033] px-3 py-1 text-xs font-mono font-bold uppercase hover:bg-white hover:text-black transition-colors cursor-pointer shrink-0"
+          >
+            {isAudioMuted ? "[ UNMUTE SIREN ]" : "[ SILENCE SIREN ]"}
+          </button>
+        </div>
+      )}
+
+      <Header />
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar />
+        <DashboardContent />
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <TelemetryProvider>
-      <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#0A0A0A] text-[#EDEDED] font-sans">
-        <Header />
-        <div className="flex flex-1 overflow-hidden">
-          <Sidebar />
-          <DashboardContent />
-        </div>
-      </div>
+      <AppShell />
     </TelemetryProvider>
   );
 }
