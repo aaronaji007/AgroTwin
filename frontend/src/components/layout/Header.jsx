@@ -95,6 +95,17 @@ export function Header() {
             </button>
           </div>
 
+          {/* VIVA PDF Manual Link */}
+          <a
+            href="/AgroTwin_Share_Expo_Viva_Guide.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 border border-[#262626] bg-[#111111] hover:border-[#00FF66] text-neutral-300 hover:text-[#00FF66] font-mono text-xs uppercase tracking-widest transition-all duration-100 cursor-pointer"
+            title="Download the Comprehensive Expo & Viva Technical Guide"
+          >
+            <span>[ VIVA GUIDE // PDF ]</span>
+          </a>
+
           {/* Alarm Trigger Bracket */}
           <button
             onClick={() => setIsAlertDrawerOpen(true)}
