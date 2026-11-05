@@ -15,7 +15,12 @@ import { calculateVPD, stepSLI, runWhatIfSimulation, COMMODITY_PROFILES } from "
 // ==========================================
 export const USE_MOCK = true;
 
-const BACKEND_BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+// Determine backend URL:
+// 1. If VITE_BACKEND_URL is explicitly configured, use it.
+// 2. In local dev (localhost/127.0.0.1), default to http://localhost:8000.
+// 3. In production (e.g. Vercel deployment), use "" (same-origin relative URL) so requests route to /api/index.py over HTTPS with zero mixed-content errors.
+const isLocalhost = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+const BACKEND_BASE_URL = import.meta.env.VITE_BACKEND_URL || (isLocalhost ? "http://localhost:8000" : "");
 
 // Runtime toggle support allows live toggling from the SCADA top status bar
 // while strictly defaulting to USE_MOCK constant

@@ -75,7 +75,8 @@ export function OverviewView() {
   };
 
   const handleCopyCurl = () => {
-    const curl = `curl -X POST http://localhost:8000/api/telemetry/esp32 -H "Content-Type: application/json" -d "{\\"device_id\\":\\"${hw.esp32DeviceId}\\",\\"bin_id\\":\\"${targetBin.id}\\",\\"dht11_temp\\":${hw.dht11.tempC},\\"dht11_humidity\\":${hw.dht11.rhPct},\\"gas_raw\\":${hw.gas.rawAdc},\\"gas_ppm\\":${hw.gas.ppm},\\"ultrasonic_distance_cm\\":${hw.ultrasonic.distanceCm}}"`;
+    const origin = typeof window !== "undefined" && window.location.origin ? window.location.origin : "http://localhost:8000";
+    const curl = `curl -X POST ${origin}/api/telemetry/esp32 -H "Content-Type: application/json" -d "{\\"device_id\\":\\"${hw.esp32DeviceId}\\",\\"bin_id\\":\\"${targetBin.id}\\",\\"dht11_temp\\":${hw.dht11.tempC},\\"dht11_humidity\\":${hw.dht11.rhPct},\\"gas_raw\\":${hw.gas.rawAdc},\\"gas_ppm\\":${hw.gas.ppm},\\"ultrasonic_distance_cm\\":${hw.ultrasonic.distanceCm}}"`;
     navigator.clipboard.writeText(curl);
     setCopyFeedback(true);
     setTimeout(() => setCopyFeedback(false), 3000);
