@@ -1,5 +1,4 @@
-import { reactorAudio } from "../services/audioAlert";
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import {
   isMockEnabled,
   setMockEnabled,
@@ -30,42 +29,6 @@ export function TelemetryProvider({ children }) {
   const [isAlertDrawerOpen, setIsAlertDrawerOpen] = useState(false);
   const [isThresholdModalOpen, setIsThresholdModalOpen] = useState(false);
   const [targetConfigBin, setTargetConfigBin] = useState(null);
-
-  const [isProximityAlertActive, setIsProximityAlertActive] = useState(false);
-  const [isAudioMuted, setIsAudioMuted] = useState(false);
-
-  // Ultrasonic Proximity Alarm Monitor (< 5.0 cm triggers nuclear reactor meltdown siren)
-  useEffect(() => {
-    const criticalBin = bins.find(b => {
-      const dist = b.hardware?.ultrasonic?.distanceCm;
-      return typeof dist === "number" && dist > 0 && dist < 5.0;
-    });
-
-    if (criticalBin) {
-      setIsProximityAlertActive(true);
-      if (!isAudioMuted) {
-        reactorAudio.startSiren();
-      }
-    } else {
-      setIsProximityAlertActive(false);
-      reactorAudio.stopSiren();
-    }
-  }, [bins, isAudioMuted]);
-
-  const toggleAudioMute = () => {
-    const muted = reactorAudio.toggleMute();
-    setIsAudioMuted(muted);
-  };
-
-  const triggerTestSiren = (seconds = 3) => {
-    reactorAudio.initContext();
-    reactorAudio.startSiren();
-    setIsProximityAlertActive(true);
-    setTimeout(() => {
-      reactorAudio.stopSiren();
-      setIsProximityAlertActive(false);
-    }, seconds * 1000);
-  };
 
   // Load initial data
   const loadAllData = useCallback(async () => {

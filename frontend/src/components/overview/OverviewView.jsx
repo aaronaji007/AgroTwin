@@ -62,13 +62,6 @@ export function OverviewView() {
         packet.gas_raw = 300;
         packet.gas_ppm = 0.06;
         packet.ultrasonic_distance_cm = 165.0; // Produce unloaded, deep distance
-      } else if (mode === "meltdown") {
-        packet.dht11_temp = targetBin.telemetry.temperature;
-        packet.dht11_humidity = targetBin.telemetry.humidity;
-        packet.gas_raw = 340;
-        packet.gas_ppm = 0.09;
-        packet.ultrasonic_distance_cm = 3.2; // < 5.0 cm triggers nuclear reactor siren!
-        packet.fill_level_pct = 98.4;
       }
 
       await sendESP32Telemetry(packet);
@@ -361,14 +354,6 @@ export function OverviewView() {
               className="px-3 py-1.5 bg-[#141414] hover:bg-[#FFB000] hover:text-black border border-[#333] text-[#FFB000] uppercase tracking-wider transition-colors duration-100 cursor-pointer disabled:opacity-50"
             >
               ⚠ TEST GAS SPIKE
-            </button>
-            <button
-              onClick={() => handleTransmitTestPacket("meltdown")}
-              disabled={isTransmitting}
-              className="px-3 py-1.5 bg-[#141414] hover:bg-[#FF0033] hover:text-black border border-[#FF0033]/40 text-[#FF0033] uppercase font-bold tracking-wider transition-colors duration-100 cursor-pointer disabled:opacity-50"
-              title="Inject Ultrasonic < 5.0 cm reading to trigger Nuclear Reactor Meltdown Siren"
-            >
-              ☢ &lt;5CM SIREN
             </button>
             <button
               onClick={handleCopyCurl}
