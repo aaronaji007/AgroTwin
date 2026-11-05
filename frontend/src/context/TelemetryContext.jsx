@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { reactorAudio } from "../services/audioAlert";
 import {
   isMockEnabled,
   setMockEnabled,
@@ -29,6 +30,43 @@ export function TelemetryProvider({ children }) {
   const [isAlertDrawerOpen, setIsAlertDrawerOpen] = useState(false);
   const [isThresholdModalOpen, setIsThresholdModalOpen] = useState(false);
   const [targetConfigBin, setTargetConfigBin] = useState(null);
+
+  // Ultrasonic Proximity Alarm State (Audio Klaxon strictly for distance < 5cm)
+  const [isProximityAlertActive, setIsProximityAlertActive] = useState(false);
+  const [isAudioMuted, setIsAudioMuted] = useState(false);
+
+  // Monitor Ultrasonic Distance across bins: < 5.0 cm triggers nuclear reactor proximity siren
+  useEffect(() => {
+    const criticalBin = bins.find(b => {
+      const dist = b.hardware?.ultrasonic?.distanceCm;
+      return typeof dist === "number" && dist > 0 && dist < 5.0;
+    });
+
+    if (criticalBin) {
+      setIsProximityAlertActive(true);
+      if (!isAudioMuted) {
+        reactorAudio.startSiren();
+      }
+    } else {
+      setIsProximityAlertActive(false);
+      reactorAudio.stopSiren();
+    }
+  }, [bins, isAudioMuted]);
+
+  const toggleAudioMute = () => {
+    const muted = reactorAudio.toggleMute();
+    setIsAudioMuted(muted);
+  };
+
+  const triggerTestSiren = (seconds = 3.5) => {
+    reactorAudio.initContext();
+    reactorAudio.startSiren();
+    setIsProximityAlertActive(true);
+    setTimeout(() => {
+      reactorAudio.stopSiren();
+      setIsProximityAlertActive(false);
+    }, seconds * 1000);
+  };
 
   // Load initial data
   const loadAllData = useCallback(async () => {
@@ -99,7 +137,6 @@ export function TelemetryProvider({ children }) {
   const triggerEvent = async (binId, eventType) => {
     try {
       const updated = await apiSimulateEvent(binId, eventType);
-      // update state
       setBins(prev => prev.map(b => b.id === binId ? updated : b));
       const [sum, alr] = await Promise.all([fetchSystemSummary(), fetchAlerts()]);
       setSummary(sum);
@@ -177,7 +214,11 @@ export function TelemetryProvider({ children }) {
         targetConfigBin,
         sendESP32Telemetry,
         openThresholdEditor,
-        refreshData: loadAllData
+        refreshData: loadAllData,
+        isProximityAlertActive,
+        isAudioMuted,
+        toggleAudioMute,
+        triggerTestSiren
       }}
     >
       {children}

@@ -8,6 +8,7 @@ export function Header() {
     alerts,
     lastPulse,
     backendError,
+    triggerTestSiren,
     setIsAlertDrawerOpen
   } = useTelemetry();
 
@@ -105,6 +106,16 @@ export function Header() {
           >
             <span>[ VIVA GUIDE // PDF ]</span>
           </a>
+
+          {/* Ultrasonic Distance Siren Demo Button */}
+          <button
+            onClick={() => triggerTestSiren(3.5)}
+            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 border border-[#333] bg-[#111111] hover:border-[#FF0033] hover:bg-[#FF0033]/10 text-neutral-300 hover:text-[#FF0033] font-mono text-xs uppercase tracking-widest transition-all duration-100 cursor-pointer"
+            title="Test Ultrasonic Proximity Reactor Siren (Plays for 3.5 seconds)"
+          >
+            <span className="text-[#FF0033] animate-pulse">☢</span>
+            <span>TEST SIREN</span>
+          </button>
 
           {/* Alarm Trigger Bracket */}
           <button
