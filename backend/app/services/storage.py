@@ -632,5 +632,41 @@ class StorageService:
         else:
             b.status = BinStatus.NOMINAL
 
+        # Automatically record unacknowledged SCADA alarm if not already logged
+        now_str = datetime.now().isoformat()
+        if temp_critical or temp_warning:
+            has_active_temp_alert = any(a["bin_id"] == b.id and a["parameter"] == "TEMPERATURE" and not a["acknowledged"] for a in self.alerts)
+            if not has_active_temp_alert:
+                self.alerts.insert(0, {
+                    "id": f"ALT-{random.randint(1000, 9999)}",
+                    "bin_id": b.id,
+                    "bin_name": b.name,
+                    "parameter": "TEMPERATURE",
+                    "severity": "CRITICAL" if temp_critical else "WARNING",
+                    "value": round(t, 1),
+                    "threshold": th.max_temp if t > th.max_temp else th.min_temp,
+                    "unit": "°C",
+                    "message": f"{'CRITICAL Thermal Breach' if temp_critical else 'Thermal Warning'}: Temperature ({t:.1f}°C) departed safe bounds ({th.min_temp}-{th.max_temp}°C) in {b.name}.",
+                    "timestamp": now_str,
+                    "acknowledged": False
+                })
+
+        if eth_critical or eth_warning:
+            has_active_eth_alert = any(a["bin_id"] == b.id and a["parameter"] == "ETHYLENE" and not a["acknowledged"] for a in self.alerts)
+            if not has_active_eth_alert:
+                self.alerts.insert(0, {
+                    "id": f"ALT-{random.randint(1000, 9999)}",
+                    "bin_id": b.id,
+                    "bin_name": b.name,
+                    "parameter": "ETHYLENE",
+                    "severity": "CRITICAL" if eth_critical else "WARNING",
+                    "value": round(eth, 3),
+                    "threshold": th.max_ethylene,
+                    "unit": "ppm",
+                    "message": f"Climacteric Surge: Ethylene concentration ({eth:.3f} ppm) exceeded threshold ({th.max_ethylene} ppm) in {b.name}.",
+                    "timestamp": now_str,
+                    "acknowledged": False
+                })
+
 # Singleton storage instance
 storage = StorageService()
